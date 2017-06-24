@@ -106,7 +106,14 @@ func createChannel(c *gin.Context) {
 					log.Println(err)
 					continue
 				}
-				channel.Stream <- data
+
+				// Distribute
+				for _, user := range channel.Users {
+					if user.WSConn != nil {
+						user.WSConn.WriteMessage(websocket.BinaryMessage, data)
+					}
+				}
+
 				time.Sleep(time.Millisecond * 2000)
 			}
 
