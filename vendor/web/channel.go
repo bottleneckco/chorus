@@ -103,6 +103,7 @@ func createChannel(c *gin.Context) {
 		Description: json.Description,
 		AccessCode:  generateAccessCode(),
 		Users:       users,
+		Stream:      make(chan []byte, 10),
 	}
 
 	setUserCookie(newUserID, c)
@@ -121,7 +122,10 @@ func getChannelIDFromParam(c *gin.Context) ChannelID {
 
 func getChannel(c *gin.Context) {
 	channelID := getChannelIDFromParam(c)
-	c.JSON(http.StatusOK, Channels[channelID])
+	channel := Channels[channelID]
+	channel.UsersArray = formatUsersForJson(channel.Users)
+
+	c.JSON(http.StatusOK, channel)
 }
 
 func addChannelUser(c *gin.Context) {

@@ -1,0 +1,82 @@
+{
+	"variables": [],
+	"info": {
+		"name": "chorus",
+		"_postman_id": "2d704615-04ee-7ee0-0f98-69d705c2360e",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Channel",
+			"request": {
+				"url": "http://{{host_url}}/api/channels",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"best channel\",\n\t\"description\": \"best channel in the world\",\n\t\"created_by\": \"harry\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Add user to channel",
+			"request": {
+				"url": "http://{{host_url}}/api/channels/1/users",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"nickname\": \"tom\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get channel users",
+			"request": {
+				"url": "http://{{host_url}}/api/channels/1/users",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"nickname\": \"xzczxc\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get channel",
+			"request": {
+				"url": "http://{{host_url}}/api/channels/1",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
