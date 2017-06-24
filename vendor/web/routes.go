@@ -10,11 +10,24 @@ import (
 
 var channelMap = make(map[ChannelID]Channel)
 
+func preflight(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", "*")
+	c.Header("Access-Control-Allow-Methods", "POST, OPTIONS")
+	c.Header("Access-Control-Allow-Headers", "Content-Type")
+	c.AbortWithStatus(200)
+}
+
 // StartServer yay
 func StartServer() {
 	router := gin.Default()
 
 	router.StaticFS("/sample", http.Dir("./client/sample"))
+
+	router.Use(
+		func(c *gin.Context) {
+			c.Header("Access-Control-Allow-Origin", "*")
+		},
+	)
 
 	apiR := router.Group("/api")
 	{
@@ -23,6 +36,7 @@ func StartServer() {
 			channelR.GET("/:id/search", searchMusic)
 
 			channelR.GET("/:id", getChannel)
+			channelR.OPTIONS("", preflight)
 			channelR.POST("", createChannel)
 
 			channelR.GET("/:id/queue", getChannelQueue)
