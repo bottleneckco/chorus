@@ -1,6 +1,7 @@
 package web
 
 import (
+	"errors"
 	"io"
 	"io/ioutil"
 	"log"
@@ -101,7 +102,11 @@ func createChannel(c *gin.Context) {
 	var json CreateChannelPayload
 	err := c.BindJSON(&json)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "unable to unmarshal json"})
+		c.JSON(http.StatusBadRequest, response{
+			Status: statusError,
+			Error:  errors.New("Invalid payload"),
+		})
+		return
 	}
 
 	users := make(map[int]User)
@@ -131,7 +136,10 @@ func createChannel(c *gin.Context) {
 	// Populate usersArr for view
 	channel.UsersArray = formatUsersForJson(users)
 
-	c.JSON(http.StatusOK, channel)
+	c.JSON(http.StatusOK, channelCreateResponse{
+		response{Status: statusOK},
+		channel,
+	})
 
 	// Channel Manager
 	go func() {
@@ -217,7 +225,11 @@ func addChannelUser(c *gin.Context) {
 	var json CreateUserPayload
 	err := c.BindJSON(&json)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "unable to unmarshal json"})
+		c.JSON(http.StatusBadRequest, response{
+			Status: statusError,
+			Error:  errors.New("Invalid payload"),
+		})
+		return
 	}
 
 	channel := Channels[channelID]
@@ -237,19 +249,25 @@ func addChannelUser(c *gin.Context) {
 	// Populate usersArr for view
 	channel.UsersArray = formatUsersForJson(users)
 
-	c.JSON(http.StatusOK, channel)
+	c.JSON(http.StatusOK, response{Status: statusOK})
 }
 
 func getChannelUsers(c *gin.Context) {
 	channelID := getChannelIDFromParam(c)
-	c.JSON(http.StatusOK, formatUsersForJson(Channels[channelID].Users))
+	c.JSON(http.StatusOK, channelListUsersResponse{
+		response: response{Status: statusOK},
+		Users:    formatUsersForJson(Channels[channelID].Users),
+	})
 }
 
 func getChannelQueue(c *gin.Context) {
 	channelID := getChannelIDFromParam(c)
 	channel, isChannelExists := Channels[channelID]
 	if !isChannelExists {
-		c.AbortWithStatus(http.StatusInternalServerError)
+		c.JSON(http.StatusInternalServerError, response{
+			Status: statusError,
+			Error:  errors.New("Channel does not exist"),
+		})
 		return
 	}
 
@@ -263,10 +281,10 @@ func getChannelQueue(c *gin.Context) {
 		})
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"status": "ok",
-		"length": len(jsonArray),
-		"queue":  jsonArray,
+	c.JSON(http.StatusOK, channelListQueueResponse{
+		response: response{Status: statusOK},
+		Count:    len(jsonArray),
+		Queue:    jsonArray,
 	})
 }
 
@@ -274,37 +292,47 @@ func addToChannelQueue(c *gin.Context) {
 	var payload addToChannelQueuePayload
 	err := c.BindJSON(&payload)
 	if err != nil {
-		c.AbortWithStatus(http.StatusNotAcceptable)
+		c.JSON(http.StatusBadRequest, response{
+			Status: statusError,
+			Error:  errors.New("Invalid payload"),
+		})
 		return
 	}
 
 	channelID := getChannelIDFromParam(c)
 	channel, isChannelExists := Channels[channelID]
 	if !isChannelExists {
-		c.AbortWithStatus(http.StatusInternalServerError)
+		c.JSON(http.StatusInternalServerError, response{
+			Status: statusError,
+			Error:  errors.New("Channel does not exist"),
+		})
 		return
 	}
 
 	channel.Queue = append(channel.Queue, channel.VideoResultsCache[payload.URL])
 	Channels[channelID] = channel
 
-	c.JSON(http.StatusOK, gin.H{
-		"status": "ok",
-	})
+	c.JSON(http.StatusOK, response{Status: statusOK})
 }
 
 func skipInChannelQueue(c *gin.Context) {
 	channelID := getChannelIDFromParam(c)
 	channel, isChannelExists := Channels[channelID]
 	if !isChannelExists {
-		c.AbortWithStatus(http.StatusInternalServerError)
+		c.JSON(http.StatusInternalServerError, response{
+			Status: statusError,
+			Error:  errors.New("Channel does not exist"),
+		})
 		return
 	}
 
 	indexStr := c.Param("index")
 	index, err := strconv.Atoi(indexStr)
 	if err != nil || len(indexStr) == 0 || index < 0 || index > len(channel.Queue)-1 {
-		c.AbortWithStatus(http.StatusNotAcceptable)
+		c.JSON(http.StatusNotAcceptable, response{
+			Status: statusError,
+			Error:  errors.New("Invalid index"),
+		})
 		return
 	}
 
@@ -312,8 +340,5 @@ func skipInChannelQueue(c *gin.Context) {
 	channel.Queue = append(channel.Queue[:index], channel.Queue[index+1:]...)
 	Channels[channelID] = channel
 
-	c.JSON(http.StatusOK, gin.H{
-		"status": "ok",
-		"length": len(channel.Queue),
-	})
+	c.JSON(http.StatusOK, response{Status: statusOK})
 }
