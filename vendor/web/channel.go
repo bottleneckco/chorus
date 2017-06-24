@@ -3,6 +3,7 @@ package web
 import (
 	"math/rand"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/speps/go-hashids"
@@ -68,8 +69,14 @@ func createChannel(c *gin.Context) {
 	c.JSON(http.StatusOK, channel)
 }
 
-func getChannel(c *gin.Context) {
+func getChannelIDFromParam(c *gin.Context) ChannelID {
+	id, _ := strconv.Atoi(c.Param("id"))
+	return ChannelID(id)
+}
 
+func getChannel(c *gin.Context) {
+	channelID := getChannelIDFromParam(c)
+	c.JSON(http.StatusOK, Channels[channelID])
 }
 
 func addChannelUser(c *gin.Context) {
