@@ -1,59 +1,21 @@
 ## API Documentation
 
 ### POST /api/search
-Returns a list of video
+Returns a list of youtube search results
 
-### GET /api/queue&channel={channel_id}
-Returns a list of queue
+## Channel
+### GET /api/channel
+Return channel details
 
-### POST /api/queue&channel={channel_id}
-Add to queue
-
-### POST /api/users
-#### Request
-```json
-{
-    "nickname": "tom",
-    "start_channel_id": 2,
-}
-```
-
-#### Response
-```json
-{
-    "id": 1,
-    "nickname": "tom"
-}
-```
-
-### POST /api/add-channel-user
-#### Request
-```json
-{
-    "channel_id": 1,
-    "user_id": 1
-}
-```
-
-### POST /api/remove-channel-user
-#### Request
-```json
-{
-    "channel_id": 1,
-    "user_id": 1
-}
-```
-
-### POST /channel
+### POST /api/channel
 Start a new channel
-Returns a url with unique id
 
 #### Request
 ```json
 {
     "name": "k-pop rocks",
     "description": "k-pop rocks a lot",
-    "created_by": 1
+    "creator_name": "harry"
 }
 ```
 
@@ -63,8 +25,26 @@ Returns a url with unique id
     "id": 1,
     "name": "k-pop rocks",
     "description": "k-pop rocks a lot",
-    "channel_url": "chorus.com/asd55cz8xsa",
-    "created_by": 2
+    "channel_url": "chorus.com/asd55cz8xsa"
+}
+```
+
+### GET /api/channel/:id/queue
+Returns a list of queue
+
+### POST /api/channel/:id/queue
+Add to queue
+
+**NOT IN USE**
+### GET /api/channel/:id/users
+Return all users in channel
+
+### POST /api/channel/:id/users
+For non-creators, need to send nickname to server.
+#### Request
+```json
+{
+    "nickname": "harry"
 }
 ```
 
@@ -75,7 +55,7 @@ Returns a url with unique id
 }
 ```
 
-### GET /api/stream&channel={channel_id}
+### GET /api/channel/:id/stream
 Connect to channel WS Stream
 Audio data will be streamed through binary
 
