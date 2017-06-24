@@ -8,7 +8,7 @@ const createChannelRequest = () => ({
 });
 
 const createChannelSuccess = () => ({
-  type: types.CREATE_CHANNEL_SUCCESS  
+  type: types.CREATE_CHANNEL_SUCCESS
 });
 
 const createChannelFailure = () => ({
@@ -16,7 +16,6 @@ const createChannelFailure = () => ({
 });
 
 export const createChannel = (data) => (dispatch) => {
-
   dispatch(createChannelRequest());
   return fetch(`${API_ROOT}/api/channels`, {
     method: 'POST',
