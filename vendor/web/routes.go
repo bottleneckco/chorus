@@ -14,7 +14,7 @@ var Channels = make(map[ChannelID]Channel)
 func StartServer() {
 	router := gin.Default()
 
-	router.StaticFS("/static", http.Dir("./client/dist"))
+	router.StaticFS("/sample", http.Dir("./client/sample"))
 
 	apiR := router.Group("/api")
 	{

@@ -136,7 +136,8 @@ func createChannel(c *gin.Context) {
 	// Channel Manager
 	go func() {
 		log.Printf("Channel manager started for Channel '%s'\n", channel.Name)
-		for len(channel.Users) != 0 {
+		numUsers := 1
+		for numUsers != 0 {
 			channel = Channels[channel.ID]
 			if len(channel.Queue) == 0 {
 				time.Sleep(time.Second * 2)
@@ -178,15 +179,20 @@ func createChannel(c *gin.Context) {
 					continue
 				}
 				channel.Stream <- data
+				time.Sleep(time.Millisecond * 2000)
 			}
 
+			channel = Channels[channel.ID]
+			numUsers = len(channel.Users)
 			if len(channel.Queue) == 1 {
 				channel.Queue = make([]youtube.YoutubeVideo, 0)
 			} else {
 				channel.Queue = channel.Queue[1:]
 			}
+			Channels[channel.ID] = channel
 
 			log.Println("Job complete")
+			os.Remove(encode.ContainerDir)
 		}
 	}()
 
