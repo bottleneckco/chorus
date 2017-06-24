@@ -25,3 +25,9 @@ type channelListQueueResponse struct {
 	Count int           `json:"count"`
 	Queue []videoResult `json:"queue"`
 }
+
+type searchResponse struct {
+	response
+	Count   int           `json:"count"`
+	Results []videoResult `json:"results"`
+}
