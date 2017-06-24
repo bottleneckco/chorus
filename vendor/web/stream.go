@@ -43,7 +43,7 @@ func getStream(c *gin.Context) {
 		return
 	}
 
-	userStr, err := c.Cookie(cookieKeyUser)
+	user, err := getUserByCookies(c)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusBadRequest, response{
@@ -53,30 +53,20 @@ func getStream(c *gin.Context) {
 		return
 	}
 
-	// Attempt to restore user
-	var user User
-	err = json.Unmarshal([]byte(userStr), &user)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusBadRequest, response{
-			Status: statusError,
-			Error:  errors.New("Invalid user data"),
-		})
-		return
-	}
-
 	ws, err := upgrader.Upgrade(c.Writer, c.Request, http.Header{
 		"Sec-Websocket-Protocol": []string{
 			c.Request.Header.Get("Sec-Websocket-Protocol"),
 		},
 	})
-
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
 	defer ws.Close()
+
+	user.WSConn = ws
+	channel.Users[user.ID] = user
 
 	// Test alive function
 	go func(ws *websocket.Conn) {

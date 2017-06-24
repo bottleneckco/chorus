@@ -1,4 +1,5 @@
-document.cookie = "user_id=1; path=/"; // Fake cookie
+document.cookie = "user_id=1; path=/;"; // Fake cookie
+document.cookie = "user_nickname=Harry; path=/;"; // Fake cookie
 
 const socket = new WebSocket("ws://localhost:8080/api/channels/1/stream", "GET");
 
