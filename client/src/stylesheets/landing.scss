@@ -1,3 +1,39 @@
+@import 'variables';
+
 .landing {
+  height: 100%;
+  position: relative;
   text-align: center;
+
+  &--logo {
+    display: block;
+    height: 150px;
+    margin: 0 auto;
+  }
+
+  &--title {
+    margin: 0;
+  }
+
+  &--content {
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+
+    .heading {
+      margin-bottom: 30px;
+    }
+  }
+
+  &--company {
+    bottom: 0;
+    color: $white;
+    font-size: 1em;
+    font-weight: 400;
+    left: 50%;
+    position: absolute;
+    transform: translateX(-50%);
+  }
 }

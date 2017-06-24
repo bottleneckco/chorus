@@ -6,10 +6,11 @@ import Onboard from './containers/Onboard';
 
 import './stylesheets/normalize.css';
 import './stylesheets/base.scss';
+import './stylesheets/controls.scss';
 
 const App = () => (
   <BrowserRouter>
-    <div>
+    <div className="container">
       <Route
         exact
         path="/"
