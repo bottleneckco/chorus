@@ -18,7 +18,7 @@ func StartServer() {
 
 	apiR := router.Group("/api")
 	{
-		apiR.POST("/search", SearchMusic)
+		apiR.GET("/search", searchMusic)
 
 		channelR := apiR.Group("/channels")
 		{

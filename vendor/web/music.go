@@ -1,8 +1,43 @@
 package web
 
-import "github.com/gin-gonic/gin"
+import (
+	"log"
+	"net/http"
+	"youtube"
 
-func SearchMusic(c *gin.Context) {
-	// channelID := c.Query("channel_id")
+	"github.com/gin-gonic/gin"
+)
 
+type videoResult struct {
+	Name         string `json:"name"`
+	ThumbnailURL string `json:"thumbnail"`
+	Duration     int    `json:"duration"`
+	URL          string `json:"url"`
+}
+
+func searchMusic(c *gin.Context) {
+	query := c.Query("term")
+
+	results, err := youtube.Search(query, 10)
+	if err != nil {
+		log.Println(err)
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+
+	var jsonArray []videoResult
+	for _, result := range results {
+		jsonArray = append(jsonArray, videoResult{
+			Name:         result.Fulltitle,
+			ThumbnailURL: result.Thumbnail,
+			Duration:     result.Duration,
+			URL:          result.WebpageURL,
+		})
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "ok",
+		"length":  len(jsonArray),
+		"results": jsonArray,
+	})
 }
