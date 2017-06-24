@@ -18,6 +18,7 @@ type Channel struct {
 	AccessCode  string       `json:"access_code"`
 	CreatedBy   int          `json:"created_by"`
 	Users       map[int]User `json:"users,omitempty"`
+	Stream      chan []byte  `json:"-"`
 }
 
 type CreateChannelPayload struct {
