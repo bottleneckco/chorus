@@ -8,15 +8,15 @@ import (
 	"github.com/speps/go-hashids"
 )
 
-var Channels []Channel
+type ChannelID int
 
 type Channel struct {
-	ID          int    `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	AccessCode  string `json:"access_code"`
-	CreatedBy   int    `json:"created_by"`
-	Users       []User `json:"users"`
+	ID          ChannelID `json:"id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	AccessCode  string    `json:"access_code"`
+	CreatedBy   int       `json:"created_by"`
+	Users       []User    `json:"users,omitempty"`
 }
 
 type CreateChannelPayload struct {

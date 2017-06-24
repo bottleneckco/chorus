@@ -8,6 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var Channels map[ChannelID]Channel
+
 // StartServer yay
 func StartServer() {
 	router := gin.Default()
@@ -31,7 +33,6 @@ func StartServer() {
 
 			channelR.GET("/:id/stream", getStream)
 		}
-
 	}
 
 	port := os.Getenv("PORT")
