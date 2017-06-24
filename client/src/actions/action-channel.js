@@ -7,8 +7,9 @@ const createChannelRequest = () => ({
   type: types.CREATE_CHANNEL_REQUEST
 });
 
-const createChannelSuccess = () => ({
-  type: types.CREATE_CHANNEL_SUCCESS
+const createChannelSuccess = (res) => ({
+  type: types.CREATE_CHANNEL_SUCCESS,
+  response: res
 });
 
 const createChannelFailure = () => ({
@@ -23,13 +24,16 @@ export const createChannel = (data) => (dispatch) => {
     headers: {
       'Content-Type': 'application/json'
     }
-  }).then((response) => {
-    dispatch(createChannelSuccess());
-    console.log(response);
-
-  }).catch((error) => {
-    dispatch(createChannelFailure());
-    console.log(error)
   })
-
-}
+    .then((res) => (
+      res.json()
+    ))
+    .then((res) => {
+      dispatch(createChannelSuccess(res));
+      console.log(res);
+    })
+    .catch((err) => {
+      dispatch(createChannelFailure());
+      console.log(err);
+    });
+};
