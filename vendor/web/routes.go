@@ -10,14 +10,34 @@ import (
 
 // StartServer yay
 func StartServer() {
-	c := gin.Default()
-	c.StaticFS("/static", http.Dir("./client/dist"))
-	c.GET("/stream", getStream)
+	router := gin.Default()
+
+	router.StaticFS("/static", http.Dir("./client/dist"))
+
+	apiR := router.Group("/api")
+	{
+		apiR.POST("/search", SearchMusic)
+
+		channelR := apiR.Group("/channels")
+		{
+			channelR.GET("/:id", getChannel)
+			channelR.POST("", createChannel)
+
+			channelR.GET("/:id/queue", getChannelQueue)
+			channelR.POST("/:id/queue", addChannelQueue)
+
+			channelR.GET("/:id/users", getChannelUsers)
+			channelR.POST("/:id/users", addChannelUser)
+
+			channelR.GET("/:id/stream", getStream)
+		}
+
+	}
 
 	port := os.Getenv("PORT")
 	if len(port) == 0 {
 		port = "8080"
 	}
 
-	c.Run(fmt.Sprintf(":%s", port))
+	router.Run(fmt.Sprintf(":%s", port))
 }
