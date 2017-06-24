@@ -10,9 +10,9 @@ const fetchQueueSuccess = (data) => ({
   type: types.FETCH_CHANNEL_QUEUE_SUCCESS
 });
 
-const fetchQueueFailure = (err) => ({
-  type: types.FETCH_CHANNEL_QUEUE_FAILURE,
-  error: err
+const fetchQueueFailure = (error) => ({
+  error,
+  type: types.FETCH_CHANNEL_QUEUE_FAILURE
 });
 
 export const fetchQueue = (queueId) => (dispatch) => {
