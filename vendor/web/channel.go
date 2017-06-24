@@ -3,6 +3,7 @@ package web
 import (
 	"math/rand"
 	"net/http"
+	"sort"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -21,8 +22,9 @@ type Channel struct {
 	Description string       `json:"description"`
 	AccessCode  string       `json:"access_code"`
 	CreatedBy   int          `json:"created_by"`
-	Users       map[int]User `json:"users,omitempty"`
 	Stream      chan []byte  `json:"-"`
+	Users       map[int]User `json:"-"`
+	UsersArray  []User       `json:"users"` // UsersArray is only for display
 }
 
 type CreateChannelPayload struct {
@@ -64,6 +66,20 @@ func setUserCookie(newUserID int, c *gin.Context) {
 	)
 }
 
+func formatUsersForJson(users map[int]User) []User {
+	var usersArr []User
+
+	for _, v := range users {
+		usersArr = append(usersArr, v)
+	}
+
+	sort.Slice(usersArr, func(i, j int) bool {
+		return usersArr[i].ID < usersArr[j].ID
+	})
+
+	return usersArr
+}
+
 func createChannel(c *gin.Context) {
 	var json CreateChannelPayload
 	err := c.BindJSON(&json)
@@ -91,6 +107,10 @@ func createChannel(c *gin.Context) {
 
 	setUserCookie(newUserID, c)
 	Channels[getNextChannelID()] = channel
+
+	// Populate usersArr for view
+	channel.UsersArray = formatUsersForJson(users)
+
 	c.JSON(http.StatusOK, channel)
 }
 
@@ -127,14 +147,18 @@ func addChannelUser(c *gin.Context) {
 	channel.Users = users
 	Channels[channelID] = channel
 
+	// Populate usersArr for view
+	channel.UsersArray = formatUsersForJson(users)
+
 	c.JSON(http.StatusOK, channel)
 }
 
 func getChannelUsers(c *gin.Context) {
+	channelID := getChannelIDFromParam(c)
+	c.JSON(http.StatusOK, formatUsersForJson(Channels[channelID].Users))
 }
 
 func getChannelQueue(c *gin.Context) {
-
 }
 
 func addChannelQueue(c *gin.Context) {
