@@ -1,0 +1,15 @@
+@import 'variables';
+
+.header {
+  &--logo-large {
+    height: 150px;
+  }
+
+  &--logo-small {
+    height: 100px;
+  }
+
+  h3 {
+    font-weight: 700;
+  }
+}

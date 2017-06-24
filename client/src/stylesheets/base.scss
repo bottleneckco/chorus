@@ -43,6 +43,11 @@ p {
   font-weight: 500;
 }
 
+input:focus,
+textarea:focus {
+  outline: none;
+}
+
 .container {
   height: 100vh;
   margin: 0 auto;
