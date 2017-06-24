@@ -2,7 +2,9 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
 
+import { getIsCreating, getResponse } from '../reducers/reducer-channel';
 import { createChannel } from '../actions/action-channel';
 import Header from '../components/Header';
 import '../stylesheets/onboard.scss';
@@ -18,6 +20,12 @@ class Onboard extends Component {
 
     this.createChannel = this.createChannel.bind(this);
     this.handleInput = this.handleInput.bind(this);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.isCreating && !nextProps.isCreating) {
+      this.props.history.push(nextProps.response.access_code);
+    }
   }
 
   createChannel(e) {
@@ -44,7 +52,11 @@ class Onboard extends Component {
         <div className="onboard--content">
           <h1>Let&apos;s get this party started</h1>
 
-          <form className="onboard--form" onSubmit={this.createChannel}>
+          <form
+            autoComplete="off"
+            className="onboard--form"
+            onSubmit={this.createChannel}
+          >
             <div className="fields">
               <h3>Give your channel a title</h3>
               <input
@@ -77,14 +89,27 @@ class Onboard extends Component {
   }
 }
 
+Onboard.defaultProps = {
+  isCreating: false,
+  response: {}
+};
+
+Onboard.propTypes = {
+  createChannel: PropTypes.func.isRequired,
+  history: PropTypes.object.isRequired,
+  isCreating: PropTypes.bool,
+  response: PropTypes.object
+};
+
+const mapStateToProps = (state) => ({
+  isCreating: getIsCreating(state),
+  response: getResponse(state)
+});
+
 const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     createChannel
   }, dispatch)
 );
 
-Onboard.propTypes = {
-  createChannel: PropTypes.func.isRequired
-};
-
-export default connect(null, mapDispatchToProps)(Onboard);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Onboard));
