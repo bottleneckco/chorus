@@ -57,7 +57,7 @@ func createChannel(c *gin.Context) {
 	// Populate usersArr for view
 	channel.UsersArray = formatUsersForJson(users)
 
-	c.JSON(http.StatusOK, channelCreateResponse{
+	c.JSON(http.StatusOK, channelResponse{
 		response{Status: statusOK},
 		channel,
 	})
@@ -124,12 +124,6 @@ func createChannel(c *gin.Context) {
 			os.Remove(encode.ContainerDir)
 		}
 	}()
-
-}
-
-func getChannelIDFromParam(c *gin.Context) ChannelID {
-	id, _ := strconv.Atoi(c.Param("id"))
-	return ChannelID(id)
 }
 
 func getChannel(c *gin.Context) {
@@ -137,7 +131,10 @@ func getChannel(c *gin.Context) {
 	channel := Channels[channelID]
 	channel.UsersArray = formatUsersForJson(channel.Users)
 
-	c.JSON(http.StatusOK, channel)
+	c.JSON(http.StatusOK, channelResponse{
+		response: response{Status: statusOK},
+		Channel:  channel,
+	})
 }
 
 func addUserToChannel(c *gin.Context) {

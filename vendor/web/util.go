@@ -20,6 +20,11 @@ func generateAccessCode() string {
 	return e
 }
 
+func getChannelIDFromParam(c *gin.Context) ChannelID {
+	id, _ := strconv.Atoi(c.Param("id"))
+	return ChannelID(id)
+}
+
 func getNextChannelID() ChannelID {
 	return ChannelID(len(Channels) + 1)
 }

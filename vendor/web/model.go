@@ -29,7 +29,7 @@ type response struct {
 	Error  error  `json:"error,omitempty"`
 }
 
-type channelCreateResponse struct {
+type channelResponse struct {
 	response
 	Channel Channel `json:"channel"`
 }
