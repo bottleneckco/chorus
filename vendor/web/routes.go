@@ -18,6 +18,19 @@ func StartServer() {
 	// Users
 	router.POST("/api/users", createUser)
 
+	// Channels
+	router.POST("/api/channels", createChannel)
+
+	// Users & Channels
+	// router.POST("/api/channels/:id/users")
+
+	// Music
+	router.POST("/api/search", SearchMusic)
+
+	// Query string of channel={channel_id}
+	router.GET("/api/queue", GetQueue)
+	router.POST("/api/queue", AddToQueue)
+
 	port := os.Getenv("PORT")
 	if len(port) == 0 {
 		port = "8080"

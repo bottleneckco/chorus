@@ -6,23 +6,23 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var AllUsers []User
+var Users []User
 
 type User struct {
 	ID       int    `json:"id"`
 	Nickname string `json:"nickname"`
 }
 
-type CreateUser struct {
+type CreateUserPayload struct {
 	Nickname string `json:"nickname" binding:"required"`
 }
 
 func getNextUserID() int {
-	return len(AllUsers) + 1
+	return len(Users) + 1
 }
 
 func createUser(c *gin.Context) {
-	var json CreateUser
+	var json CreateUserPayload
 	err := c.BindJSON(&json)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "unable to unmarshal json"})
@@ -37,6 +37,6 @@ func createUser(c *gin.Context) {
 		Nickname: json.Nickname,
 	}
 
-	AllUsers = append(AllUsers, u)
+	Users = append(Users, u)
 	c.JSON(http.StatusOK, u)
 }
