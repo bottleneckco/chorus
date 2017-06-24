@@ -20,6 +20,8 @@ func StartServer() {
 
 	// Channels
 	router.POST("/api/channels", createChannel)
+	router.POST("/api/add-channel-user", addChannelUser)
+	router.POST("/api/remove-channel-user", removeChannelUser)
 
 	// Users & Channels
 	// router.POST("/api/channels/:id/users")

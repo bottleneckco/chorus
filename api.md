@@ -26,19 +26,21 @@ Add to queue
 }
 ```
 
-### POST /channel/1/users
+### POST /api/add-channel-user
 #### Request
 ```json
 {
-    "user_id": 1,
+    "channel_id": 1,
+    "user_id": 1
 }
 ```
 
-### DELETE /channel/1/users
+### POST /api/remove-channel-user
 #### Request
 ```json
 {
-    "user_id": 1,
+    "channel_id": 1,
+    "user_id": 1
 }
 ```
 
