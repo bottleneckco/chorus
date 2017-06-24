@@ -12,23 +12,18 @@ import (
 type ChannelID int
 
 type Channel struct {
-	ID          ChannelID `json:"id"`
-	Name        string    `json:"name"`
-	Description string    `json:"description"`
-	AccessCode  string    `json:"access_code"`
-	CreatedBy   int       `json:"created_by"`
-	Users       []User    `json:"users,omitempty"`
+	ID          ChannelID    `json:"id"`
+	Name        string       `json:"name"`
+	Description string       `json:"description"`
+	AccessCode  string       `json:"access_code"`
+	CreatedBy   int          `json:"created_by"`
+	Users       map[int]User `json:"users,omitempty"`
 }
 
 type CreateChannelPayload struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
-	CreatedBy   int    `json:"created_by"`
-}
-
-type ChannelUserPayload struct {
-	ChannelID int `json:"channel_id"`
-	UserID    int `json:"user_id"`
+	CreatedBy   string `json:"created_by"`
 }
 
 func (cc *CreateChannelPayload) validate() {
@@ -50,6 +45,20 @@ func generateAccessCode() string {
 	return e
 }
 
+func setUserCookie(newUserID int, c *gin.Context) {
+	newUserIDStr := strconv.Itoa(newUserID)
+
+	c.SetCookie(
+		"user_id",
+		newUserIDStr,
+		0,
+		"/channel",
+		"",
+		false,
+		false,
+	)
+}
+
 func createChannel(c *gin.Context) {
 	var json CreateChannelPayload
 	err := c.BindJSON(&json)
@@ -57,14 +66,25 @@ func createChannel(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "unable to unmarshal json"})
 	}
 
+	users := make(map[int]User)
+	newUserID := 1
+	createdByUser := User{
+		ID:       newUserID,
+		Nickname: json.CreatedBy,
+	}
+
+	users[newUserID] = createdByUser
+
 	channel := Channel{
 		ID:          getNextChannelID(),
-		CreatedBy:   json.CreatedBy,
+		CreatedBy:   newUserID,
 		Name:        json.Name,
 		Description: json.Description,
 		AccessCode:  generateAccessCode(),
+		Users:       users,
 	}
 
+	setUserCookie(newUserID, c)
 	Channels[getNextChannelID()] = channel
 	c.JSON(http.StatusOK, channel)
 }
@@ -80,13 +100,17 @@ func getChannel(c *gin.Context) {
 }
 
 func addChannelUser(c *gin.Context) {
-	// var json ChannelUserPayload
-	// err != c.BindJSON(&json)
+	// channelID := getChannelIDFromParam(c)
+
+	// var json CreateUserPayload
+	// err := c.BindJSON(&json)
+	// if err != nil {
+	// 	c.JSON(http.StatusBadRequest)
+	// }
 
 }
 
 func getChannelUsers(c *gin.Context) {
-
 }
 
 func getChannelQueue(c *gin.Context) {
