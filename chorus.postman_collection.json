@@ -2,7 +2,7 @@
 	"variables": [],
 	"info": {
 		"name": "chorus",
-		"_postman_id": "2d704615-04ee-7ee0-0f98-69d705c2360e",
+		"_postman_id": "2047da81-04ef-10ee-d095-a859f16f3b17",
 		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
@@ -23,6 +23,80 @@
 					"mode": "raw",
 					"raw": "{\n\t\"name\": \"best channel\",\n\t\"description\": \"best channel in the world\",\n\t\"created_by\": \"harry\"\n}"
 				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Search Music",
+			"request": {
+				"url": {
+					"raw": "http://{{host_url}}/api/channels/1/search?term=Mome",
+					"protocol": "http",
+					"host": [
+						"{{host_url}}"
+					],
+					"path": [
+						"api",
+						"channels",
+						"1",
+						"search"
+					],
+					"query": [
+						{
+							"key": "term",
+							"value": "Mome",
+							"equals": true,
+							"description": ""
+						}
+					],
+					"variable": []
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Add to Queue",
+			"request": {
+				"url": "http://{{host_url}}/api/channels/1/queue",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t  \"url\": \"https://www.youtube.com/watch?v=CehAKQL463M\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get Channel Queue",
+			"request": {
+				"url": "http://{{host_url}}/api/channels/1/queue",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Skip queue item",
+			"request": {
+				"url": "http://{{host_url}}/api/channels/1/queue/0",
+				"method": "DELETE",
+				"header": [],
+				"body": {},
 				"description": ""
 			},
 			"response": []
@@ -73,7 +147,10 @@
 				"url": "http://{{host_url}}/api/channels/1",
 				"method": "GET",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"description": ""
 			},
 			"response": []
