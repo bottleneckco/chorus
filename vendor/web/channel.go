@@ -5,10 +5,8 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
-	"math/rand"
 	"net/http"
 	"os"
-	"sort"
 	"strconv"
 	"time"
 
@@ -19,87 +17,10 @@ import (
 	"path"
 
 	"github.com/gin-gonic/gin"
-	"github.com/speps/go-hashids"
 )
-
-const (
-	cookieKeyUserID = "user_id"
-)
-
-type ChannelID int
-
-type Channel struct {
-	ID                ChannelID                       `json:"id"`
-	Name              string                          `json:"name"`
-	Description       string                          `json:"description"`
-	AccessCode        string                          `json:"access_code"`
-	CreatedBy         int                             `json:"created_by"`
-	VideoResultsCache map[string]youtube.YoutubeVideo `json:"-"`
-	Queue             []youtube.YoutubeVideo          `json:"-"`
-	Stream            chan []byte                     `json:"-"`
-	Users             map[int]User                    `json:"-"`
-	UsersArray        []User                          `json:"users"` // UsersArray is only for display
-}
-
-type CreateChannelPayload struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	CreatedBy   string `json:"created_by"`
-}
-
-func (cc *CreateChannelPayload) validate() {
-
-}
-
-type addToChannelQueuePayload struct {
-	URL string `json:"url"`
-}
-
-func getNextChannelID() ChannelID {
-	return ChannelID(len(Channels) + 1)
-}
-
-func generateAccessCode() string {
-	hd := hashids.NewData()
-	hd.Salt = "random salt"
-	hd.MinLength = 5
-	h, _ := hashids.NewWithData(hd)
-
-	e, _ := h.Encode([]int{rand.Int()})
-
-	return e
-}
-
-func setUserCookie(newUserID int, c *gin.Context) {
-	newUserIDStr := strconv.Itoa(newUserID)
-
-	c.SetCookie(
-		cookieKeyUserID,
-		newUserIDStr,
-		0,
-		"/channel",
-		"",
-		false,
-		false,
-	)
-}
-
-func formatUsersForJson(users map[int]User) []User {
-	var usersArr []User
-
-	for _, v := range users {
-		usersArr = append(usersArr, v)
-	}
-
-	sort.Slice(usersArr, func(i, j int) bool {
-		return usersArr[i].ID < usersArr[j].ID
-	})
-
-	return usersArr
-}
 
 func createChannel(c *gin.Context) {
-	var json CreateChannelPayload
+	var json createChannelPayload
 	err := c.BindJSON(&json)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, response{
@@ -222,7 +143,7 @@ func getChannel(c *gin.Context) {
 func addUserToChannel(c *gin.Context) {
 	channelID := getChannelIDFromParam(c)
 
-	var json CreateUserPayload
+	var json createUserPayload
 	err := c.BindJSON(&json)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, response{
