@@ -30,7 +30,7 @@ func searchMusic(c *gin.Context) {
 	}
 
 	channelID := getChannelIDFromParam(c)
-	channel, isChannelExists := Channels[channelID]
+	channel, isChannelExists := channelMap[channelID]
 	if !isChannelExists {
 		c.JSON(http.StatusInternalServerError, response{
 			Status: statusError,

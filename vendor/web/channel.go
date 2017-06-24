@@ -52,7 +52,7 @@ func createChannel(c *gin.Context) {
 	}
 
 	setUserCookie(newUserID, c)
-	Channels[getNextChannelID()] = channel
+	channelMap[getNextChannelID()] = channel
 
 	// Populate usersArr for view
 	channel.UsersArray = formatUsersForJson(users)
@@ -67,7 +67,7 @@ func createChannel(c *gin.Context) {
 		log.Printf("Channel manager started for Channel '%s'\n", channel.Name)
 		numUsers := 1
 		for numUsers != 0 {
-			channel = Channels[channel.ID]
+			channel = channelMap[channel.ID]
 			if len(channel.Queue) == 0 {
 				time.Sleep(time.Second * 2)
 				continue
@@ -111,14 +111,14 @@ func createChannel(c *gin.Context) {
 				time.Sleep(time.Millisecond * 2000)
 			}
 
-			channel = Channels[channel.ID]
+			channel = channelMap[channel.ID]
 			numUsers = len(channel.Users)
 			if len(channel.Queue) == 1 {
 				channel.Queue = make([]youtube.YoutubeVideo, 0)
 			} else {
 				channel.Queue = channel.Queue[1:]
 			}
-			Channels[channel.ID] = channel
+			channelMap[channel.ID] = channel
 
 			log.Println("Job complete")
 			os.Remove(encode.ContainerDir)
@@ -128,7 +128,7 @@ func createChannel(c *gin.Context) {
 
 func getChannel(c *gin.Context) {
 	channelID := getChannelIDFromParam(c)
-	channel := Channels[channelID]
+	channel := channelMap[channelID]
 	channel.UsersArray = formatUsersForJson(channel.Users)
 
 	c.JSON(http.StatusOK, channelResponse{
@@ -150,7 +150,7 @@ func addUserToChannel(c *gin.Context) {
 		return
 	}
 
-	channel := Channels[channelID]
+	channel := channelMap[channelID]
 	users := channel.Users
 
 	newUserID := len(users) + 1
@@ -162,7 +162,7 @@ func addUserToChannel(c *gin.Context) {
 	users[newUserID] = newUser
 
 	channel.Users = users
-	Channels[channelID] = channel
+	channelMap[channelID] = channel
 
 	// Populate usersArr for view
 	channel.UsersArray = formatUsersForJson(users)
@@ -174,13 +174,13 @@ func getUsersInChannel(c *gin.Context) {
 	channelID := getChannelIDFromParam(c)
 	c.JSON(http.StatusOK, channelListUsersResponse{
 		response: response{Status: statusOK},
-		Users:    formatUsersForJson(Channels[channelID].Users),
+		Users:    formatUsersForJson(channelMap[channelID].Users),
 	})
 }
 
 func getChannelQueue(c *gin.Context) {
 	channelID := getChannelIDFromParam(c)
-	channel, isChannelExists := Channels[channelID]
+	channel, isChannelExists := channelMap[channelID]
 	if !isChannelExists {
 		c.JSON(http.StatusInternalServerError, response{
 			Status: statusError,
@@ -218,7 +218,7 @@ func addToChannelQueue(c *gin.Context) {
 	}
 
 	channelID := getChannelIDFromParam(c)
-	channel, isChannelExists := Channels[channelID]
+	channel, isChannelExists := channelMap[channelID]
 	if !isChannelExists {
 		c.JSON(http.StatusInternalServerError, response{
 			Status: statusError,
@@ -228,14 +228,14 @@ func addToChannelQueue(c *gin.Context) {
 	}
 
 	channel.Queue = append(channel.Queue, channel.VideoResultsCache[payload.URL])
-	Channels[channelID] = channel
+	channelMap[channelID] = channel
 
 	c.JSON(http.StatusOK, response{Status: statusOK})
 }
 
 func skipInChannelQueue(c *gin.Context) {
 	channelID := getChannelIDFromParam(c)
-	channel, isChannelExists := Channels[channelID]
+	channel, isChannelExists := channelMap[channelID]
 	if !isChannelExists {
 		c.JSON(http.StatusInternalServerError, response{
 			Status: statusError,
@@ -256,7 +256,7 @@ func skipInChannelQueue(c *gin.Context) {
 
 	// I know
 	channel.Queue = append(channel.Queue[:index], channel.Queue[index+1:]...)
-	Channels[channelID] = channel
+	channelMap[channelID] = channel
 
 	c.JSON(http.StatusOK, response{Status: statusOK})
 }

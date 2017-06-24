@@ -26,7 +26,7 @@ func getChannelIDFromParam(c *gin.Context) ChannelID {
 }
 
 func getNextChannelID() ChannelID {
-	return ChannelID(len(Channels) + 1)
+	return ChannelID(len(channelMap) + 1)
 }
 
 func setUserCookie(newUserID int, c *gin.Context) {

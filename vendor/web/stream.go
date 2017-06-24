@@ -36,7 +36,7 @@ func getStream(c *gin.Context) {
 		return
 	}
 
-	channel, isChannelExists := Channels[ChannelID(channelID)]
+	channel, isChannelExists := channelMap[ChannelID(channelID)]
 	if !isChannelExists {
 		c.JSON(http.StatusInternalServerError, response{
 			Status: statusError,
