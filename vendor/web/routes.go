@@ -13,25 +13,26 @@ func StartServer() {
 	router := gin.Default()
 
 	router.StaticFS("/static", http.Dir("./client/dist"))
-	router.GET("/stream", getStream)
 
-	// Users
-	router.POST("/api/users", createUser)
+	apiR := router.Group("/api")
+	{
+		apiR.POST("/search", SearchMusic)
 
-	// Channels
-	router.POST("/api/channels", createChannel)
-	router.POST("/api/add-channel-user", addChannelUser)
-	router.POST("/api/remove-channel-user", removeChannelUser)
+		channelR := apiR.Group("/channels")
+		{
+			channelR.GET("/:id", getChannel)
+			channelR.POST("", createChannel)
 
-	// Users & Channels
-	// router.POST("/api/channels/:id/users")
+			channelR.GET("/:id/queue", getChannelQueue)
+			channelR.POST("/:id/queue", addChannelQueue)
 
-	// Music
-	router.POST("/api/search", SearchMusic)
+			channelR.GET("/:id/users", getChannelUsers)
+			channelR.POST("/:id/users", addChannelUser)
 
-	// Query string of channel={channel_id}
-	router.GET("/api/queue", GetQueue)
-	router.POST("/api/queue", AddToQueue)
+			channelR.GET("/:id/stream", getStream)
+		}
+
+	}
 
 	port := os.Getenv("PORT")
 	if len(port) == 0 {

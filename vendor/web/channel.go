@@ -67,12 +67,24 @@ func createChannel(c *gin.Context) {
 	c.JSON(http.StatusOK, channel)
 }
 
+func getChannel(c *gin.Context) {
+
+}
+
 func addChannelUser(c *gin.Context) {
 	// var json ChannelUserPayload
 	// err != c.BindJSON(&json)
 
 }
 
-func removeChannelUser(c *gin.Context) {
+func getChannelUsers(c *gin.Context) {
+
+}
+
+func getChannelQueue(c *gin.Context) {
+
+}
+
+func addChannelQueue(c *gin.Context) {
 
 }
