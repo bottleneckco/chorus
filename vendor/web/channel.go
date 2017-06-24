@@ -9,6 +9,10 @@ import (
 	"github.com/speps/go-hashids"
 )
 
+const (
+	cookieKeyUserID = "user_id"
+)
+
 type ChannelID int
 
 type Channel struct {
@@ -18,6 +22,7 @@ type Channel struct {
 	AccessCode  string       `json:"access_code"`
 	CreatedBy   int          `json:"created_by"`
 	Users       map[int]User `json:"users,omitempty"`
+	Stream      chan []byte  `json:"-"`
 }
 
 type CreateChannelPayload struct {
@@ -49,7 +54,7 @@ func setUserCookie(newUserID int, c *gin.Context) {
 	newUserIDStr := strconv.Itoa(newUserID)
 
 	c.SetCookie(
-		"user_id",
+		cookieKeyUserID,
 		newUserIDStr,
 		0,
 		"/channel",
