@@ -32,11 +32,11 @@ func getStream(c *gin.Context) {
 		return
 	}
 
-	if _, ok := Channels[ChannelID(channelID)]; !ok {
+	channel, isChannelExists := Channels[ChannelID(channelID)]
+	if !isChannelExists {
 		c.Status(http.StatusInternalServerError)
 		return
 	}
-	channel := Channels[ChannelID(channelID)]
 
 	ws, err := upgrader.Upgrade(c.Writer, c.Request, http.Header{
 		"Sec-Websocket-Protocol": []string{
@@ -51,11 +51,32 @@ func getStream(c *gin.Context) {
 
 	defer ws.Close()
 
+	userIDStr, err := c.GetCookie(cookieKeyUserID)
+	if err != nil {
+		log.Println(err)
+		c.Status(http.StatusNotAcceptable)
+		return
+	}
+	userID, err := strconv.Atoi(userIDStr)
+	if err != nil {
+		log.Println(err)
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+
+	_, isUserExists := channel.Users[userID]
+	if !isUserExists {
+		log.Println(err)
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+
 	go func(ws *websocket.Conn) {
 		// Copy from channel stream
 		for data := range channel.Stream {
 			if err = ws.WriteMessage(websocket.BinaryMessage, data); err != nil {
 				// Error writing, probably user disconnected
+				delete(channel.Users, userID)
 				// TODO: Delete the user from the channel
 				log.Println(err)
 				break

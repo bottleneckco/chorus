@@ -9,6 +9,10 @@ import (
 	"github.com/speps/go-hashids"
 )
 
+const (
+	cookieKeyUserID = "user_id"
+)
+
 type ChannelID int
 
 type Channel struct {
@@ -50,7 +54,7 @@ func setUserCookie(newUserID int, c *gin.Context) {
 	newUserIDStr := strconv.Itoa(newUserID)
 
 	c.SetCookie(
-		"user_id",
+		cookieKeyUserID,
 		newUserIDStr,
 		0,
 		"/channel",
