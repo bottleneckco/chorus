@@ -1,11 +1,27 @@
 import React from 'react';
-import Square from './components/Square';
+import { BrowserRouter, Route } from 'react-router-dom';
+
+import Landing from './containers/Landing';
+import Onboard from './containers/Onboard';
+
+import './stylesheets/normalize.css';
+import './stylesheets/base.scss';
+import './stylesheets/controls.scss';
 
 const App = () => (
-  <div>
-    <h1>Welcome to Chorus</h1>
-    <Square text="Cool beans" />
-  </div>
+  <BrowserRouter>
+    <div className="container">
+      <Route
+        exact
+        path="/"
+        render={(props) => <Landing {...props} />}
+      />
+      <Route
+        path="/onboard"
+        render={(props) => <Onboard {...props} />}
+      />
+    </div>
+  </BrowserRouter>
 );
 
 export default App;
