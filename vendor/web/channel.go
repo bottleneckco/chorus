@@ -52,7 +52,7 @@ func createChannel(c *gin.Context) {
 	}
 
 	setUserCookie(newUserID, c)
-	channelMap[getNextChannelID()] = channel
+	channelMap[getNextChannelID()] = &channel
 
 	// Populate usersArr for view
 	channel.UsersArray = formatUsersForJson(users)
@@ -67,7 +67,6 @@ func createChannel(c *gin.Context) {
 		log.Printf("Channel manager started for Channel '%s'\n", channel.Name)
 		numUsers := 1
 		for numUsers != 0 {
-			channel = channelMap[channel.ID]
 			if len(channel.Queue) == 0 {
 				time.Sleep(time.Second * 2)
 				continue
@@ -111,14 +110,12 @@ func createChannel(c *gin.Context) {
 				time.Sleep(time.Millisecond * 2000)
 			}
 
-			channel = channelMap[channel.ID]
 			numUsers = len(channel.Users)
 			if len(channel.Queue) == 1 {
 				channel.Queue = make([]youtube.YoutubeVideo, 0)
 			} else {
 				channel.Queue = channel.Queue[1:]
 			}
-			channelMap[channel.ID] = channel
 
 			log.Println("Job complete")
 			os.Remove(encode.ContainerDir)
@@ -133,7 +130,7 @@ func getChannel(c *gin.Context) {
 
 	c.JSON(http.StatusOK, channelResponse{
 		response: response{Status: statusOK},
-		Channel:  channel,
+		Channel:  *channel,
 	})
 }
 
