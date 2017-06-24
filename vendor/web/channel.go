@@ -1,12 +1,21 @@
 package web
 
 import (
+	"io"
+	"io/ioutil"
+	"log"
 	"math/rand"
 	"net/http"
+	"os"
 	"sort"
 	"strconv"
+	"time"
 
 	"youtube"
+
+	"ffmpeg"
+
+	"path"
 
 	"github.com/gin-gonic/gin"
 	"github.com/speps/go-hashids"
@@ -122,12 +131,65 @@ func createChannel(c *gin.Context) {
 	// Populate usersArr for view
 	channel.UsersArray = formatUsersForJson(users)
 
+	c.JSON(http.StatusOK, channel)
+
 	// Channel Manager
 	go func() {
+		log.Printf("Channel manager started for Channel '%s'\n", channel.Name)
+		for len(channel.Users) != 0 {
+			channel = Channels[channel.ID]
+			if len(channel.Queue) == 0 {
+				time.Sleep(time.Second * 2)
+				continue
+			}
 
+			result := channel.Queue[0]
+
+			log.Printf("Downloading file '%s' via URL '%s'\n", result.Fulltitle, result.Formats[0].URL)
+
+			// Download file
+			downloadFile, err := ioutil.TempFile(os.TempDir(), "audio")
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			resp, err := http.Get(result.Formats[0].URL)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+
+			defer resp.Body.Close()
+			io.Copy(downloadFile, resp.Body)
+
+			log.Printf("Segmenting '%s'\n", downloadFile.Name())
+
+			encode, err := ffmpeg.Segment(downloadFile.Name())
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+
+			for _, segmentFileName := range encode.SegmentFileNames {
+				log.Printf("Feeding segment '%s'\n", segmentFileName)
+				data, err := ioutil.ReadFile(path.Join(encode.ContainerDir, segmentFileName))
+				if err != nil {
+					log.Println(err)
+					continue
+				}
+				channel.Stream <- data
+			}
+
+			if len(channel.Queue) == 1 {
+				channel.Queue = make([]youtube.YoutubeVideo, 0)
+			} else {
+				channel.Queue = channel.Queue[1:]
+			}
+
+			log.Println("Job complete")
+		}
 	}()
 
-	c.JSON(http.StatusOK, channel)
 }
 
 func getChannelIDFromParam(c *gin.Context) ChannelID {
