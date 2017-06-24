@@ -10,14 +10,18 @@ import (
 
 // StartServer yay
 func StartServer() {
-	c := gin.Default()
-	c.StaticFS("/static", http.Dir("./client/dist"))
-	c.GET("/stream", getStream)
+	router := gin.Default()
+
+	router.StaticFS("/static", http.Dir("./client/dist"))
+	router.GET("/stream", getStream)
+
+	// Users
+	router.POST("/api/users", createUser)
 
 	port := os.Getenv("PORT")
 	if len(port) == 0 {
 		port = "8080"
 	}
 
-	c.Run(fmt.Sprintf(":%s", port))
+	router.Run(fmt.Sprintf(":%s", port))
 }
