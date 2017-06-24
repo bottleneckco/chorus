@@ -29,8 +29,8 @@ func StartServer() {
 			channelR.POST("/:id/queue", addToChannelQueue)
 			channelR.DELETE("/:id/queue/:index", skipInChannelQueue)
 
-			channelR.GET("/:id/users", getChannelUsers)
-			channelR.POST("/:id/users", addChannelUser)
+			channelR.GET("/:id/users", getUsersInChannel)
+			channelR.POST("/:id/users", addUserToChannel)
 
 			channelR.GET("/:id/stream", getStream)
 		}

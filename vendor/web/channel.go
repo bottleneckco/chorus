@@ -219,7 +219,7 @@ func getChannel(c *gin.Context) {
 	c.JSON(http.StatusOK, channel)
 }
 
-func addChannelUser(c *gin.Context) {
+func addUserToChannel(c *gin.Context) {
 	channelID := getChannelIDFromParam(c)
 
 	var json CreateUserPayload
@@ -252,7 +252,7 @@ func addChannelUser(c *gin.Context) {
 	c.JSON(http.StatusOK, response{Status: statusOK})
 }
 
-func getChannelUsers(c *gin.Context) {
+func getUsersInChannel(c *gin.Context) {
 	channelID := getChannelIDFromParam(c)
 	c.JSON(http.StatusOK, channelListUsersResponse{
 		response: response{Status: statusOK},
