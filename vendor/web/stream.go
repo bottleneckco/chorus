@@ -4,6 +4,8 @@ import (
 	"log"
 	"net/http"
 
+	"io/ioutil"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
@@ -29,12 +31,19 @@ func getStream(c *gin.Context) {
 
 	defer ws.Close()
 
+	audioFile, err := ioutil.ReadFile("free.mp3")
+	if err != nil {
+		log.Println(err)
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+
 	for {
 		_, _, err := ws.ReadMessage()
 		if err != nil {
 			return
 		}
-		if err = ws.WriteMessage(websocket.TextMessage, []byte("Hello there, this is Go!")); err != nil {
+		if err = ws.WriteMessage(websocket.BinaryMessage, audioFile); err != nil {
 			log.Println(err)
 			break
 		}
