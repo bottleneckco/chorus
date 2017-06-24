@@ -4,7 +4,6 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import { createChannel } from '../actions/action-channel';
-
 import Header from '../components/Header';
 import '../stylesheets/onboard.scss';
 
@@ -23,9 +22,11 @@ class Onboard extends Component {
 
   createChannel(e) {
     e.preventDefault();
-    console.log(this.state.title, this.state.nickname);
-    this.props.createChannel({});
-    // create new channel and redirect to channel page
+
+    this.props.createChannel({
+      name: this.state.title,
+      created_by: this.state.nickname
+    });
   }
 
   handleInput(e) {

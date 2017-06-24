@@ -23,13 +23,13 @@ export const createChannel = (data) => (dispatch) => {
     headers: {
       'Content-Type': 'application/json'
     }
-  }).then((response) => {
-    dispatch(createChannelSuccess());
-    console.log(response);
-
-  }).catch((error) => {
-    dispatch(createChannelFailure());
-    console.log(error)
   })
-
-}
+    .then((response) => {
+      dispatch(createChannelSuccess());
+      console.log(response);
+    })
+    .catch((error) => {
+      dispatch(createChannelFailure());
+      console.log(error);
+    });
+};
