@@ -40,7 +40,7 @@ const config = {
         use: ['babel-loader'],
         exclude: /node_modules/
       }, {
-        test: /\.scss$/,
+        test: /\.(css|scss)$/,
         use: [{
           loader: 'style-loader'
           // creates style nodes from JS strings
@@ -54,7 +54,7 @@ const config = {
           loader: 'postcss-loader'
         }]
       }, {
-        test: /\.(jpg|png|svg)$/,
+        test: /\.(jpg|png|svg|eot|ttf|woff|woff2)$/,
         use: {
           loader: 'url-loader',
           options: {
