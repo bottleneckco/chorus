@@ -38,19 +38,6 @@ func getStream(c *gin.Context) {
 		return
 	}
 
-	ws, err := upgrader.Upgrade(c.Writer, c.Request, http.Header{
-		"Sec-Websocket-Protocol": []string{
-			c.Request.Header.Get("Sec-Websocket-Protocol"),
-		},
-	})
-
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	defer ws.Close()
-
 	userIDStr, err := c.GetCookie(cookieKeyUserID)
 	if err != nil {
 		log.Println(err)
@@ -71,13 +58,29 @@ func getStream(c *gin.Context) {
 		return
 	}
 
+	ws, err := upgrader.Upgrade(c.Writer, c.Request, http.Header{
+		"Sec-Websocket-Protocol": []string{
+			c.Request.Header.Get("Sec-Websocket-Protocol"),
+		},
+	})
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	defer ws.Close()
+
 	go func(ws *websocket.Conn) {
 		// Copy from channel stream
 		for data := range channel.Stream {
+			log.Printf("Sending out %d bytes\n", len(data))
 			if err = ws.WriteMessage(websocket.BinaryMessage, data); err != nil {
 				// Error writing, probably user disconnected
-				delete(channel.Users, userID)
+
 				// TODO: Delete the user from the channel
+				// TODO: Need a better way to handle this. User refreshes page = lost forever.
+				// delete(channel.Users, userID)
 				log.Println(err)
 				break
 			}

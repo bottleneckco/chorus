@@ -25,6 +25,14 @@ func searchMusic(c *gin.Context) {
 		return
 	}
 
+	channelID := getChannelIDFromParam(c)
+	channel, isChannelExists := Channels[channelID]
+	if !isChannelExists {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	// Add to the cache
 	var jsonArray []videoResult
 	for _, result := range results {
 		jsonArray = append(jsonArray, videoResult{
@@ -33,6 +41,7 @@ func searchMusic(c *gin.Context) {
 			Duration:     result.Duration,
 			URL:          result.WebpageURL,
 		})
+		channel.VideoResultsCache[result.WebpageURL] = result
 	}
 
 	c.JSON(http.StatusOK, gin.H{

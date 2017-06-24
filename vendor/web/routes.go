@@ -14,19 +14,20 @@ var Channels = make(map[ChannelID]Channel)
 func StartServer() {
 	router := gin.Default()
 
-	router.StaticFS("/static", http.Dir("./client/dist"))
+	router.StaticFS("/sample", http.Dir("./client/sample"))
 
 	apiR := router.Group("/api")
 	{
-		apiR.GET("/search", searchMusic)
-
 		channelR := apiR.Group("/channels")
 		{
+			channelR.GET("/:id/search", searchMusic)
+
 			channelR.GET("/:id", getChannel)
 			channelR.POST("", createChannel)
 
 			channelR.GET("/:id/queue", getChannelQueue)
-			channelR.POST("/:id/queue", addChannelQueue)
+			channelR.POST("/:id/queue", addToChannelQueue)
+			channelR.DELETE("/:id/queue/:index", skipInChannelQueue)
 
 			channelR.GET("/:id/users", getChannelUsers)
 			channelR.POST("/:id/users", addChannelUser)

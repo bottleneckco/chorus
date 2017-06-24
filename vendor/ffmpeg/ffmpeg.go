@@ -14,7 +14,7 @@ import (
 // Segment a file into segments of 5s each. Returns list of files' absolute paths.
 func Segment(filename string) (SegmentResult, error) {
 	timeNow := time.Now().Nanosecond()
-	targetDir := path.Join(os.TempDir(), strings.TrimSuffix(filepath.Base(filename), filepath.Ext(filename)))
+	targetDir := path.Join(os.TempDir(), fmt.Sprintf("%s-segment", strings.TrimSuffix(filepath.Base(filename), filepath.Ext(filename))))
 
 	result := SegmentResult{
 		ContainerDir: targetDir,
