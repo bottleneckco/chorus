@@ -34,16 +34,17 @@ func (cc *CreateChannelPayload) validate() {
 
 }
 
-func getNextChannelID() int {
-	return len(Channels) + 1
+func getNextChannelID() ChannelID {
+	return ChannelID(len(Channels) + 1)
 }
 
 func generateAccessCode() string {
 	hd := hashids.NewData()
 	hd.Salt = "random salt"
-	hd.MinLength = 10
+	hd.MinLength = 5
 	h, _ := hashids.NewWithData(hd)
-	e, _ := h.Encode([]int{getNextChannelID(), rand.Int()})
+
+	e, _ := h.Encode([]int{rand.Int()})
 
 	return e
 }
@@ -57,13 +58,13 @@ func createChannel(c *gin.Context) {
 
 	channel := Channel{
 		ID:          getNextChannelID(),
+		CreatedBy:   json.CreatedBy,
 		Name:        json.Name,
 		Description: json.Description,
-		CreatedBy:   json.CreatedBy,
 		AccessCode:  generateAccessCode(),
 	}
 
-	Channels = append(Channels, channel)
+	Channels[getNextChannelID()] = channel
 	c.JSON(http.StatusOK, channel)
 }
 

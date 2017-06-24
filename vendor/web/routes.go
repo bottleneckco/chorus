@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var Channels map[ChannelID]Channel
+var Channels = make(map[ChannelID]Channel)
 
 // StartServer yay
 func StartServer() {
