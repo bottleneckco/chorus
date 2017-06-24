@@ -13,12 +13,18 @@
     "autoprefixer": "^7.1.1",
     "clean-webpack-plugin": "^0.1.16",
     "html-webpack-plugin": "^2.28.0",
+    "promise-polyfill": "^6.0.2",
     "prop-types": "^15.5.10",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "react-hot-loader": "next",
+    "react-redux": "^5.0.5",
     "react-router-dom": "^4.1.1",
-    "webpack": "2.6.1"
+    "redux": "^3.7.0",
+    "redux-logger": "^3.0.6",
+    "redux-thunk": "^2.2.0",
+    "webpack": "2.6.1",
+    "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",

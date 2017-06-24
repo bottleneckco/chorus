@@ -5,6 +5,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const config = {
   entry: {
     main: [
+      'whatwg-fetch',
+
       'react-hot-loader/patch',
       // activate HMR for react
 
