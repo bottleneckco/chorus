@@ -105,14 +105,29 @@ func getChannel(c *gin.Context) {
 }
 
 func addChannelUser(c *gin.Context) {
-	// channelID := getChannelIDFromParam(c)
+	channelID := getChannelIDFromParam(c)
 
-	// var json CreateUserPayload
-	// err := c.BindJSON(&json)
-	// if err != nil {
-	// 	c.JSON(http.StatusBadRequest)
-	// }
+	var json CreateUserPayload
+	err := c.BindJSON(&json)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "unable to unmarshal json"})
+	}
 
+	channel := Channels[channelID]
+	users := channel.Users
+
+	newUserID := len(users) + 1
+	newUser := User{
+		ID:       newUserID,
+		Nickname: json.Nickname,
+	}
+
+	users[newUserID] = newUser
+
+	channel.Users = users
+	Channels[channelID] = channel
+
+	c.JSON(http.StatusOK, channel)
 }
 
 func getChannelUsers(c *gin.Context) {
