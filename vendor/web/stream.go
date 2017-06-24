@@ -1,6 +1,7 @@
 package web
 
 import (
+	"errors"
 	"log"
 	"net/http"
 
@@ -28,33 +29,48 @@ func getStream(c *gin.Context) {
 
 	if err != nil {
 		log.Println(err)
-		c.Status(http.StatusNotAcceptable)
+		c.JSON(http.StatusBadRequest, response{
+			Status: statusError,
+			Error:  errors.New("No channel id"),
+		})
 		return
 	}
 
-	channel, isChannelExists := Channels[ChannelID(channelID)]
+	channel, isChannelExists := channelMap[ChannelID(channelID)]
 	if !isChannelExists {
-		c.Status(http.StatusInternalServerError)
+		c.JSON(http.StatusInternalServerError, response{
+			Status: statusError,
+			Error:  errors.New("Channel does not exist"),
+		})
 		return
 	}
 
 	userIDStr, err := c.GetCookie(cookieKeyUserID)
 	if err != nil {
 		log.Println(err)
-		c.Status(http.StatusNotAcceptable)
+		c.JSON(http.StatusBadRequest, response{
+			Status: statusError,
+			Error:  errors.New("Error retrieving cookies"),
+		})
 		return
 	}
 	userID, err := strconv.Atoi(userIDStr)
 	if err != nil {
 		log.Println(err)
-		c.Status(http.StatusInternalServerError)
+		c.JSON(http.StatusBadRequest, response{
+			Status: statusError,
+			Error:  errors.New("Invalid user id"),
+		})
 		return
 	}
 
 	_, isUserExists := channel.Users[userID]
 	if !isUserExists {
 		log.Println(err)
-		c.Status(http.StatusInternalServerError)
+		c.JSON(http.StatusBadRequest, response{
+			Status: statusError,
+			Error:  errors.New("Invalid user"),
+		})
 		return
 	}
 

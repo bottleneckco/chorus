@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var Channels = make(map[ChannelID]Channel)
+var channelMap = make(map[ChannelID]Channel)
 
 // StartServer yay
 func StartServer() {
@@ -29,8 +29,8 @@ func StartServer() {
 			channelR.POST("/:id/queue", addToChannelQueue)
 			channelR.DELETE("/:id/queue/:index", skipInChannelQueue)
 
-			channelR.GET("/:id/users", getChannelUsers)
-			channelR.POST("/:id/users", addChannelUser)
+			channelR.GET("/:id/users", getUsersInChannel)
+			channelR.POST("/:id/users", addUserToChannel)
 
 			channelR.GET("/:id/stream", getStream)
 		}

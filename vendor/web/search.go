@@ -1,6 +1,7 @@
 package web
 
 import (
+	"errors"
 	"log"
 	"net/http"
 	"youtube"
@@ -21,14 +22,20 @@ func searchMusic(c *gin.Context) {
 	results, err := youtube.Search(query, 10)
 	if err != nil {
 		log.Println(err)
-		c.Status(http.StatusInternalServerError)
+		c.JSON(http.StatusInternalServerError, response{
+			Status: statusError,
+			Error:  errors.New("Error with service provider"),
+		})
 		return
 	}
 
 	channelID := getChannelIDFromParam(c)
-	channel, isChannelExists := Channels[channelID]
+	channel, isChannelExists := channelMap[channelID]
 	if !isChannelExists {
-		c.AbortWithStatus(http.StatusInternalServerError)
+		c.JSON(http.StatusInternalServerError, response{
+			Status: statusError,
+			Error:  errors.New("Channel does not exist"),
+		})
 		return
 	}
 
@@ -44,9 +51,9 @@ func searchMusic(c *gin.Context) {
 		channel.VideoResultsCache[result.WebpageURL] = result
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"status":  "ok",
-		"length":  len(jsonArray),
-		"results": jsonArray,
+	c.JSON(http.StatusOK, searchResponse{
+		response: response{Status: statusOK},
+		Count:    len(jsonArray),
+		Results:  jsonArray,
 	})
 }
