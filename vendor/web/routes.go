@@ -1,12 +1,17 @@
 package web
 
-import "github.com/gin-gonic/gin"
-import "os"
-import "fmt"
+import (
+	"fmt"
+	"net/http"
+	"os"
+
+	"github.com/gin-gonic/gin"
+)
 
 // StartServer yay
 func StartServer() {
 	c := gin.Default()
+	c.StaticFS("/static", http.Dir("./client/dist"))
 	c.GET("/stream", getStream)
 
 	port := os.Getenv("PORT")
