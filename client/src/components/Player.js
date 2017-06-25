@@ -28,7 +28,7 @@ const Player = ({ resume, pause, playing, currentSong, adjustAudioVol }) => {
 
   if (Object.keys(currentSong).length === 0) {
     return (
-      <div>Add some songs</div>
+      <h1 className="player--empty">How about adding some songs?</h1>
     );
   }
 

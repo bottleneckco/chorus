@@ -6,6 +6,11 @@
   text-align: center;
   width: 100%;
 
+  &--empty {
+    margin: 10% 0;
+    text-align: center;
+  }
+
   &--thumbnail {
     border: 15px $white solid;
     border-bottom: 50px $white solid;
