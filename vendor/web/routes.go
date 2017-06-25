@@ -2,16 +2,14 @@ package web
 
 import (
 	"fmt"
-	"net/http"
-	"net/url"
 	"os"
 
-	"strings"
-
-	"net/http/httputil"
+	"net/http"
+	"io/ioutil"
 
 	"github.com/gin-gonic/gin"
 	"github.com/itsjamie/gin-cors"
+	"github.com/gin-contrib/static"
 )
 
 var channelMap = make(map[string]*Channel)
@@ -20,7 +18,26 @@ var channelMap = make(map[string]*Channel)
 func StartServer() {
 	router := gin.Default()
 
-	router.StaticFS("/", http.Dir("./client/dist/"))
+	router.Use(
+		func(c *gin.Context) {
+			urlPath := c.Request.URL.EscapedPath()
+			if len(urlPath) == 0 {
+				c.Next()
+				return
+			}
+			if _, isChannelExists := channelMap[urlPath[1:]]; isChannelExists {
+				data, err := ioutil.ReadFile("./client/dist/index.html")
+				if err != nil {
+					c.AbortWithStatus(http.StatusInternalServerError)
+					return
+				}
+				c.Data(http.StatusOK, gin.MIMEHTML, data)
+			}
+		},
+	)
+
+	router.Use(static.Serve("/", static.LocalFile("./client/dist/", true)))
+	// router.StaticFS("/", http.Dir("./client/dist/"))
 
 	router.Use(
 		func(c *gin.Context) {
@@ -28,20 +45,20 @@ func StartServer() {
 		},
 	)
 
-	reverseProxy := httputil.NewSingleHostReverseProxy(&url.URL{
-		Scheme: "http",
-		Host:   "localhost:8000",
-	})
-
-	router.Use(
-		func(c *gin.Context) {
-			if strings.HasPrefix(c.Request.URL.EscapedPath(), "/api") {
-				c.Next()
-			} else {
-				reverseProxy.ServeHTTP(c.Writer, c.Request)
-			}
-		},
-	)
+	// reverseProxy := httputil.NewSingleHostReverseProxy(&url.URL{
+	// 	Scheme: "http",
+	// 	Host:   "localhost:8000",
+	// })
+	//
+	// router.Use(
+	// 	func(c *gin.Context) {
+	// 		if strings.HasPrefix(c.Request.URL.EscapedPath(), "/api") {
+	// 			c.Next()
+	// 		} else {
+	// 			reverseProxy.ServeHTTP(c.Writer, c.Request)
+	// 		}
+	// 	},
+	// )
 
 	router.Use(cors.Middleware(cors.Config{
 		Origins:         "*",

@@ -82,6 +82,9 @@ type Channel struct {
 func (c Channel) BroadcastMessage(messageType int, data []byte) error {
 	var err error
 	for _, user := range c.Users {
+		if user.WSConn == nil {
+			continue
+		}
 		err = user.WSConn.WriteMessage(messageType, data)
 		if err != nil {
 			return err
@@ -96,6 +99,9 @@ func (c Channel) CheckUsersStillAlive() {
 		pingData, _ := json.Marshal(websocketCommand{
 			Command: commandPing,
 		})
+		if user.WSConn == nil {
+			continue
+		}
 		err = user.WSConn.WriteMessage(websocket.TextMessage, pingData)
 		if err != nil {
 			delete(c.Users, user.ID)
