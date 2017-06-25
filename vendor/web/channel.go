@@ -64,7 +64,7 @@ func createChannel(c *gin.Context) {
 	go func() {
 		log.Printf("Channel manager started for Channel '%s'\n", channel.Name)
 		numUsers := 1
-		for numUsers != 0 {
+		for numUsers != 0 || len(channel.Queue) > 0 {
 			if len(channel.Queue) == 0 {
 				time.Sleep(time.Second * 2)
 				continue
@@ -112,7 +112,7 @@ func createChannel(c *gin.Context) {
 					}
 				}
 
-				time.Sleep(time.Millisecond * 2000)
+				time.Sleep(time.Millisecond * 4000)
 			}
 
 			numUsers = len(channel.Users)
