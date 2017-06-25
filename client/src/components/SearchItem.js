@@ -11,15 +11,17 @@ const convertToMinSec = (durationInSec) => {
 
 const SearchItem = ({ item, addMusic }) => (
   <div className="searchitem" onClick={() => addMusic(item.url)}>
-    <div className="searchitem-content">
-      <img src={item.thumbnail} className="searchitem-thumbnail" alt={item.thumbnail} />
-      <div className="searchitem-details">
-        <div className="searchitem-name">
-          {item.name}
-        </div>
-        <div className="searchitem-duration">
-          {convertToMinSec(item.duration)}
-        </div>
+    <img
+      src={item.thumbnail}
+      alt={item.thumbnail}
+      className="searchitem--thumbnail"
+    />
+    <div className="searchitem--details">
+      <div className="searchitem--name">
+        {item.name}
+      </div>
+      <div className="searchitem--duration">
+        {convertToMinSec(item.duration)}
       </div>
     </div>
   </div>
@@ -40,7 +42,8 @@ SearchItem.propTypes = {
     thumbnail: PropTypes.string.isRequired,
     url: PropTypes.string.isRequired,
     duration: PropTypes.number.isRequired
-  })
+  }),
+  addMusic: PropTypes.func.isRequired
 };
 
 export default SearchItem;

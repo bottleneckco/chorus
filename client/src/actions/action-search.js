@@ -21,19 +21,22 @@ export const searchMusic = (channelId, term) => (dispatch) => {
   return fetch(`${API_ROOT}/api/channels/${channelId}/search?term=${term}`, {
     method: 'GET',
     credentials: 'same-origin'
-  }).then((response) => (
-    response.json()
-  )).then((json) => {
-    if (json.status === 'ok') {
-      dispatch(searchMusicSuccess(json.results));
-    } else {
-      dispatch(searchMusicFailure(JSON.stringify(json)));
-    }
-  }).catch((err) => {
-    dispatch(searchMusicFailure(err));
-  });
+  })
+    .then((response) => (
+      response.json()
+    ))
+    .then((json) => {
+      if (json.status === 'ok') {
+        dispatch(searchMusicSuccess(json.results));
+      } else {
+        dispatch(searchMusicFailure(JSON.stringify(json)));
+      }
+    })
+    .catch((err) => {
+      dispatch(searchMusicFailure(err));
+    });
 };
 
 export const clearSearchResults = () => ({
   type: types.CLEAR_SEARCH_RESULTS
-})
+});
