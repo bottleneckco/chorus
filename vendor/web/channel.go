@@ -182,7 +182,10 @@ func addUserToChannel(c *gin.Context) {
 	// Populate usersArr for view
 	channel.UsersArray = formatUsersForJson(users)
 
-	c.JSON(http.StatusOK, response{Status: statusOK})
+	c.JSON(http.StatusOK, channelAddUserResponse{
+		response: response{Status: statusOK},
+		User:     newUser,
+	})
 }
 
 func getUsersInChannel(c *gin.Context) {
