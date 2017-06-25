@@ -1,6 +1,7 @@
 package web
 
 import (
+	"encoding/json"
 	"io"
 	"io/ioutil"
 	"log"
@@ -20,8 +21,8 @@ import (
 )
 
 func createChannel(c *gin.Context) {
-	var json createChannelPayload
-	err := c.BindJSON(&json)
+	var payload createChannelPayload
+	err := c.BindJSON(&payload)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, response{
 			Status: statusError,
@@ -34,7 +35,7 @@ func createChannel(c *gin.Context) {
 	newUserID := 1
 	createdByUser := User{
 		ID:       newUserID,
-		Nickname: json.CreatedBy,
+		Nickname: payload.CreatedBy,
 	}
 
 	users[newUserID] = createdByUser
@@ -42,8 +43,8 @@ func createChannel(c *gin.Context) {
 	channel := Channel{
 		ID:                generateAccessCode(),
 		CreatedBy:         newUserID,
-		Name:              json.Name,
-		Description:       json.Description,
+		Name:              payload.Name,
+		Description:       payload.Description,
 		Users:             users,
 		VideoResultsCache: make(map[string]youtube.YoutubeVideo),
 		Queue:             make([]youtube.YoutubeVideo, 0),
@@ -68,6 +69,7 @@ func createChannel(c *gin.Context) {
 		for numUsers != 0 || len(channel.Queue) > 0 {
 			if len(channel.Queue) == 0 {
 				time.Sleep(time.Second * 2)
+				channel.SanitiseUsers()
 				continue
 			}
 
@@ -100,6 +102,9 @@ func createChannel(c *gin.Context) {
 
 			for _, segmentFileName := range encode.SegmentFileNames {
 				log.Printf("Feeding segment '%s'\n", segmentFileName)
+
+				channel.SanitiseUsers()
+
 				data, err := ioutil.ReadFile(path.Join(encode.ContainerDir, segmentFileName))
 				if err != nil {
 					log.Println(err)
@@ -107,15 +112,15 @@ func createChannel(c *gin.Context) {
 				}
 
 				// Distribute
-				for _, user := range channel.Users {
-					if user.WSConn != nil {
-						user.WSConn.WriteMessage(websocket.BinaryMessage, data)
-					}
-				}
+				channel.BroadcastMessage(websocket.BinaryMessage, data)
 
 				// Check if we should abort distribution of the current song
 				if channel.SkipCurrent {
 					channel.SkipCurrent = false
+					jsonData, _ := json.Marshal(websocketCommand{
+						Command: commandSkipCurrent,
+					})
+					channel.BroadcastMessage(websocket.TextMessage, jsonData)
 					break
 				}
 
