@@ -1,0 +1,40 @@
+@import 'variables';
+
+.player {
+  margin: 0 auto;
+  max-width: 700px;
+  text-align: center;
+  width: 100%;
+
+  &--thumbnail {
+    display: block;
+    margin: 0 auto;
+    max-height: 250px;
+    max-width: 100%;
+  }
+
+  &--song {
+    margin: 20px 0 30px;
+  }
+
+  &--controls {
+    .control {
+      cursor: pointer;
+      transition: all .1s ease-out;
+      vertical-align: middle;
+    }
+
+    .control:hover {
+      transform: scale(1.1);
+    }
+
+    .control-side {
+      height: 40px;
+    }
+
+    .control-center {
+      height: 60px;
+      margin: 0 70px;
+    }
+  }
+}
