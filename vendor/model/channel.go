@@ -126,7 +126,7 @@ func (c *Channel) BroadcastManager() {
 			c.RemoveUser(result.User.ID)
 
 			// Broadcast
-			jsonData, _ := json.Marshal(map[string]interface{}{as
+			jsonData, _ := json.Marshal(map[string]interface{}{
 				"command": userLeft,
 				"user":    *result.User,
 			})
@@ -229,6 +229,13 @@ func (c *Channel) Manager() {
 
 		// Remove the item from the queue
 		c.I.Queue.PopFirst()
+
+		// Check if channel died
+		if c.I.Queue.Count() == 0 && len(c.I.Users) == 0 {
+			close(c.I.CommandStream)
+			close(c.I.DataBroadcastStream)
+			ticker.Stop()
+		}
 	}
 }
 
