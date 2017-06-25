@@ -21,12 +21,16 @@ class WSPlayer extends Component {
   constructor(props) {
     super(props);
 
-    this.state = { playing: true };
+    this.state = {
+      playing: true,
+      nextSongs: []
+    };
 
     this.initWS = this.initWS.bind(this);
     this.pause = this.pause.bind(this);
     this.resume = this.resume.bind(this);
     this.adjustAudioVol = this.adjustAudioVol.bind(this);
+    this.skipQueueItem = this.skipQueueItem.bind(this);
   }
 
   componentWillMount() {
@@ -92,7 +96,13 @@ class WSPlayer extends Component {
     this.audio.volume = newVol / 100.0;
   }
 
+  skipQueueItem(index) {
+    this.props.skipQueueItem(this.props.data.id, index);
+  }
+
   render() {
+    const currentSong = this.props.queue[0] || {};
+
     return (
       <div className="channel">
         <Nav title={this.props.data.name} />
@@ -100,9 +110,10 @@ class WSPlayer extends Component {
           pause={this.pause}
           resume={this.resume}
           playing={this.state.playing}
+          currentSong={currentSong}
           adjustAudioVol={this.adjustAudioVol}
         />
-        <Queue queue={this.props.queue} />
+        <Queue queue={this.props.queue} skipQueueItem={this.skipQueueItem} />
       </div>
     );
   }
@@ -110,7 +121,8 @@ class WSPlayer extends Component {
 
 WSPlayer.propTypes = {
   data: PropTypes.object.isRequired,
-  queue: PropTypes.array.isRequired
+  queue: PropTypes.array.isRequired,
+  skipQueueItem: PropTypes.func.isRequired
 };
 
 export default WSPlayer;

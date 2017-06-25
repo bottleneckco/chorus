@@ -34,6 +34,14 @@
   }
 }
 
+.button-orange-10 {
+  color: $orange-10;
+
+  &:hover {
+    background: $red-0;
+  }
+}
+
 %textbox {
   font-family: 'Geomanist';
 }

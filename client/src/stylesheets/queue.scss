@@ -1,5 +1,60 @@
-.queue {
-  // position: absolute;
-  // bottom: 0;
+@import 'variables';
 
+%cell {
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.queue {
+  background: $orange-10;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  margin: 0 auto;
+  max-width: 450px;
+  padding: 20px;
+  width: 100%;
+
+  &--add {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    width: 100%;
+  }
+
+  &--list {
+    height: 50%;
+    overflow: hidden;
+  }
+
+  &--headings {
+    color: $red-10;
+    font-size: 1em;
+    font-weight: 700;
+  }
+
+  .item {
+    color: $white;
+    font-weight: 400;
+    margin-top: 20px;
+  }
+
+  .col--song {
+    @extend %cell;
+    margin-right: 15px;
+    width: calc(65% - 15px);
+  }
+
+  .col--user {
+    @extend %cell;
+    margin-right: 15px;
+    width: calc(35% - 35px);
+  }
+
+  .col--skip {
+    @extend %cell;
+    cursor: pointer;
+    width: 20px;
+  }
 }

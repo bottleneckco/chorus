@@ -7,7 +7,7 @@ import { getRehydrationStatus } from '../reducers/reducer-persistence';
 import { getChannelData, getChannelIsFetching } from '../reducers/reducer-channel';
 import { getQueue, getQueueIsFetching } from '../reducers/reducer-queue';
 import { fetchChannel, addUserToChannel } from '../actions/action-channel';
-import { fetchQueue } from '../actions/action-queue';
+import { fetchQueue, skipQueueItem } from '../actions/action-queue';
 
 import WSPlayer from './WSPlayer';
 import Onboard from './Onboard';
@@ -33,7 +33,6 @@ class Channel extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log('receiveprops');
     if (nextProps.rehydrated && !this.state.rehydrated) {
       this.setState({ rehydrated: true });
 
@@ -55,14 +54,11 @@ class Channel extends Component {
     this.setState({ shouldOnboard: false });
   }
 
-  adjustAudioVol(newVol) {
-    this.audio.volume(newVol / 100.0);
-  }
-
   render() {
-    const { data, channelIsFetching, queue } = this.props;
+    const { data, channelIsFetching, queue, queueIsFetching } = this.props;
 
-    if (channelIsFetching || Object.keys(data).length === 0) {
+    if (channelIsFetching || queueIsFetching
+      || Object.keys(data).length === 0) {
       return <div>Loading...</div>;
     }
 
@@ -74,6 +70,7 @@ class Channel extends Component {
       <WSPlayer
         data={data}
         queue={queue}
+        skipQueueItem={this.props.skipQueueItem}
       />
     );
   }
@@ -93,6 +90,7 @@ Channel.propTypes = {
   queueIsFetching: PropTypes.bool.isRequired,
 
   addUserToChannel: PropTypes.func.isRequired,
+  skipQueueItem: PropTypes.func.isRequired,
   fetchChannel: PropTypes.func.isRequired,
   fetchQueue: PropTypes.func.isRequired
 };
@@ -108,6 +106,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     addUserToChannel,
+    skipQueueItem,
     fetchChannel,
     fetchQueue
   }, dispatch)
