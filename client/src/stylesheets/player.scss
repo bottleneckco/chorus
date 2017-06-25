@@ -2,11 +2,16 @@
 
 .player {
   margin: 0 auto;
-  max-width: 700px;
+  max-width: 800px;
   text-align: center;
   width: 100%;
 
   &--thumbnail {
+    border: 15px $white solid;
+    border-bottom: 50px $white solid;
+    border-radius: 3px;
+    box-shadow: 0 1px 2px $shadow;
+    box-sizing: content-box;
     display: block;
     margin: 0 auto;
     max-height: 250px;

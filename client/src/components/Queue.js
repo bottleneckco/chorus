@@ -13,6 +13,8 @@ const Queue = ({ queue, skipQueueItem }) => {
           className="col--skip"
           src={crossIcon}
           alt="skip"
+          role="button"
+          tabIndex="0"
           onClick={() => skipQueueItem(index)}
         />
       </div>
