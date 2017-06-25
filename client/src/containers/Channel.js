@@ -18,7 +18,7 @@ import '../stylesheets/channel.scss';
 const convertToArrayBuffer = (data) => (
     new Promise((resolve) => {
       const fileReader = new FileReader();
-      fileReader.onload = () => {
+      fileReader.onload = function() { // Needs to remain an ES5 function
         resolve(this.result);
       };
       fileReader.readAsArrayBuffer(data);

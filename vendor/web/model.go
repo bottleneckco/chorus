@@ -71,6 +71,7 @@ type Channel struct {
 	Queue             []youtube.YoutubeVideo          `json:"-"`
 	Users             map[int]User                    `json:"-"`
 	UsersArray        []User                          `json:"users"` // UsersArray is only for display
+	SkipCurrent       bool                            `json:"-"`     // Set this to true so the manager will abort distributing the current song on its next loop
 }
 
 func (c Channel) BroadcastMessage(messageType int, data []byte) error {

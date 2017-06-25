@@ -47,6 +47,7 @@ func createChannel(c *gin.Context) {
 		Users:             users,
 		VideoResultsCache: make(map[string]youtube.YoutubeVideo),
 		Queue:             make([]youtube.YoutubeVideo, 0),
+		SkipCurrent:       false,
 	}
 
 	setUserCookie(createdByUser, c)
@@ -110,6 +111,12 @@ func createChannel(c *gin.Context) {
 					if user.WSConn != nil {
 						user.WSConn.WriteMessage(websocket.BinaryMessage, data)
 					}
+				}
+
+				// Check if we should abort distribution of the current song
+				if channel.SkipCurrent {
+					channel.SkipCurrent = false
+					break
 				}
 
 				time.Sleep(time.Millisecond * 4000)
@@ -278,8 +285,11 @@ func skipInChannelQueue(c *gin.Context) {
 	}
 
 	// I know
-	channel.Queue = append(channel.Queue[:index], channel.Queue[index+1:]...)
-	channelMap[c.Param("id")] = channel
+	if len(channel.Queue) > 1 && index != 0 {
+		channel.Queue = append(channel.Queue[:index], channel.Queue[index+1:]...)
+	} else {
+		channel.SkipCurrent = true
+	}
 
 	c.JSON(http.StatusOK, response{Status: statusOK})
 }
