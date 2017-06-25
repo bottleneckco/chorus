@@ -46,7 +46,7 @@ type channelAddUserResponse struct {
 
 type channelListUsersResponse struct {
 	response
-	Users []model.User `json:"users"`
+	Users []*model.User `json:"users"`
 }
 
 type channelListQueueResponse struct {
@@ -57,7 +57,7 @@ type channelListQueueResponse struct {
 
 type channelListQueueItem struct {
 	ID          int         `json:"id"`
-	User        User        `json:"user"`
+	User        model.User  `json:"user"`
 	VideoResult videoResult `json:"video"`
 }
 

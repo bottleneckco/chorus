@@ -5,8 +5,6 @@ import (
 	"log"
 	"net/http"
 
-	"encoding/json"
-
 	"model"
 
 	"github.com/gin-gonic/gin"
@@ -53,8 +51,9 @@ func getStream(c *gin.Context) {
 
 	defer ws.Close()
 
-	user.WSConn = model.WSConn{Conn: ws}
-	channel.I.Users[user.ID] = user
+	user.WSConn = &model.WSConn{Conn: ws}
+	channel.AddUser(&user)
+	// channel.I.Users[user.ID] = user
 
 	for {
 		messageType, data, err := ws.ReadMessage()
@@ -72,16 +71,12 @@ func getStream(c *gin.Context) {
 
 		switch string(data) {
 		case commandPause:
-			jsonData, _ := json.Marshal(websocketCommand{
-				Command: commandPause,
-			})
-			channel.BroadcastMessage(websocket.TextMessage, jsonData)
+			channel.IssueCommand(model.ChannelCommandPause)
+			channel.BroadcastJSON(websocketCommand{Command: commandPause})
 			break
 		case commandResume:
-			jsonData, _ := json.Marshal(websocketCommand{
-				Command: commandResume,
-			})
-			channel.BroadcastMessage(websocket.TextMessage, jsonData)
+			channel.IssueCommand(model.ChannelCommandResume)
+			channel.BroadcastJSON(websocketCommand{Command: commandResume})
 			break
 		}
 	}

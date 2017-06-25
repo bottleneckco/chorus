@@ -62,8 +62,8 @@ func setUserCookie(user model.User, c *gin.Context) {
 	)
 }
 
-func formatUsersForJson(users map[int]model.User) []model.User {
-	var usersArr = make([]model.User, 0)
+func formatUsersForJson(users map[int]*model.User) []*model.User {
+	var usersArr = make([]*model.User, 0)
 
 	for _, v := range users {
 		usersArr = append(usersArr, v)
