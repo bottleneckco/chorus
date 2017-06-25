@@ -1,6 +1,7 @@
 package web
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -57,7 +58,7 @@ func getStream(c *gin.Context) {
 	// Test alive function
 	go func(ws *websocket.Conn) {
 		// Copy from channel stream
-		ticker := time.NewTicker(time.Second * 10)
+		ticker := time.NewTicker(time.Millisecond * 3)
 		for range ticker.C {
 			pingData, _ := json.Marshal(websocketCommand{
 				Command: commandPing,
@@ -82,6 +83,8 @@ func getStream(c *gin.Context) {
 			log.Println("Client sent a non-textual message, ignored")
 			return
 		}
+
+		fmt.Printf("websocket: received `%s` from client\n", string(data))
 
 		switch string(data) {
 		case commandPause:
