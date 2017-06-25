@@ -6,8 +6,6 @@ import Nav from '../components/Nav';
 import Queue from '../components/Queue';
 import Player from '../components/Player';
 
-import SearchBar from '../containers/SearchBar';
-
 const convertToArrayBuffer = (data) => (
   new Promise((resolve) => {
     const fileReader = new FileReader();
@@ -24,11 +22,8 @@ class WSPlayer extends Component {
 
     this.state = {
       playing: true,
-<<<<<<< HEAD
-      nextSongs: []
-=======
+      nextSongs: [],
       showSearchBar: true
->>>>>>> Basic searchbar layout completed
     };
 
     this.initWS = this.initWS.bind(this);
@@ -105,16 +100,6 @@ class WSPlayer extends Component {
     this.props.skipQueueItem(this.props.data.id, index);
   }
 
-  renderSearchBar() {
-    const { showSearchBar } = this.state;
-
-    if (showSearchBar) {
-      return <SearchBar hideSearchBar={() => this.setState({ showSearchBar: false })} />;
-    }
-
-    return null;
-  }
-
   render() {
     const currentSong = this.props.queue[0] || {};
 
@@ -129,7 +114,6 @@ class WSPlayer extends Component {
           adjustAudioVol={this.adjustAudioVol}
         />
         <Queue queue={this.props.queue} skipQueueItem={this.skipQueueItem} />
-        {this.renderSearchBar()}
       </div>
     );
   }

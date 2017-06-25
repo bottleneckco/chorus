@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
+import { addToQueue } from '../actions/action-queue';
 import { searchMusic, clearSearchResults } from '../actions/action-search';
 import { getChannelId } from '../reducers/reducer-channel';
 import { getSearchIsFetching, getResults } from '../reducers/reducer-search';
@@ -42,7 +43,7 @@ class SearchBar extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log(nextProps);
+    // console.log(nextProps);
   }
 
   componentWillUnmount() {
@@ -78,8 +79,6 @@ class SearchBar extends Component {
     const domNode = ReactDOM.findDOMNode(this);
 
     if ((!domNode || !domNode.contains(event.target))) {
-      // window.removeEventListener('click', this.handleClickOutside.bind(this), true);
-      console.log('hi');
       this.destroy();
     }
   }
@@ -89,10 +88,12 @@ class SearchBar extends Component {
     this.props.hideSearchBar();
   }
 
-  addMusicToQueue(url) {
-    console.log(url)
+  addMusicToQueue(urlStr) {
+    const data = { url: urlStr };
+    this.props.addToQueue(this.props.channelId, data);
+    this.destroy();
   }
-  
+
   renderItems() {
     const { results } = this.props;
 
@@ -136,7 +137,8 @@ SearchBar.propTypes = {
   searchMusic: PropTypes.func.isRequired,
   channelId: PropTypes.string.isRequired,
   clearSearchResults: PropTypes.func.isRequired,
-  hideSearchBar: PropTypes.func.isRequired
+  hideSearchBar: PropTypes.func.isRequired,
+  addToQueue: PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) => ({
@@ -148,7 +150,8 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     searchMusic,
-    clearSearchResults
+    clearSearchResults,
+    addToQueue
   }, dispatch)
 );
 
