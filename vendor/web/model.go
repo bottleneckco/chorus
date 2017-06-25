@@ -38,6 +38,11 @@ type channelResponse struct {
 	Channel Channel `json:"channel"`
 }
 
+type channelAddUserResponse struct {
+	response
+	User User `json:"user"`
+}
+
 type channelListUsersResponse struct {
 	response
 	Users []User `json:"users"`
