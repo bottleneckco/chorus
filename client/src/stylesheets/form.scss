@@ -1,0 +1,25 @@
+@import 'variables';
+
+.form {
+  text-align: center;
+
+  .textbox-line {
+    font-size: 2.25em;
+    font-weight: 500;
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  .button-solid {
+    font-size: 1.5em;
+    margin-top: 20px;
+  }
+
+  &--field {
+    margin-bottom: 50px;
+  }
+
+  &--label {
+    color: $orange-20;
+  }
+}
