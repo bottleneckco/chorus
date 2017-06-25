@@ -22,8 +22,8 @@
 gin-bin
 
 vendor/*/
-!vendor/ffmpeg/*/
-!vendor/web/*/
-!vendor/youtube/*/
-!vendor/model/*/
+!vendor/ffmpeg
+!vendor/web
+!vendor/youtube
+!vendor/model
 !vendor/vendor.json
