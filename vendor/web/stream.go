@@ -7,6 +7,8 @@ import (
 
 	"encoding/json"
 
+	"model"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
@@ -51,7 +53,7 @@ func getStream(c *gin.Context) {
 
 	defer ws.Close()
 
-	user.WSConn = ws
+	user.WSConn = model.WSConn{Conn: ws}
 	channel.Users[user.ID] = user
 
 	for {

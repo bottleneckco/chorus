@@ -1,11 +1,6 @@
 package web
 
-import (
-	"encoding/json"
-	"youtube"
-
-	"github.com/gorilla/websocket"
-)
+import "model"
 
 const (
 	statusOK           = "ok"
@@ -14,6 +9,7 @@ const (
 	commandResume      = "resume"
 	commandPing        = "ping"
 	commandSkipCurrent = "skipCurrent"
+	commandUsersLeft   = "usersLeft"
 )
 
 // Payload models
@@ -40,17 +36,17 @@ type response struct {
 
 type channelResponse struct {
 	response
-	Channel Channel `json:"channel"`
+	Channel model.Channel `json:"channel"`
 }
 
 type channelAddUserResponse struct {
 	response
-	User User `json:"user"`
+	User model.User `json:"user"`
 }
 
 type channelListUsersResponse struct {
 	response
-	Users []User `json:"users"`
+	Users []model.User `json:"users"`
 }
 
 type channelListQueueResponse struct {
@@ -71,62 +67,12 @@ type searchResponse struct {
 	Results []videoResult `json:"results"`
 }
 
-// Data models
-
-type Channel struct {
-	ID                string                          `json:"id"`
-	Name              string                          `json:"name"`
-	Description       string                          `json:"description"`
-	CreatedBy         int                             `json:"created_by"`
-	VideoResultsCache map[string]youtube.YoutubeVideo `json:"-"`
-	Queue             []QueueItem                     `json:"-"`
-	Users             map[int]User                    `json:"-"`
-	UsersArray        []User                          `json:"users"` // UsersArray is only for display
-	SkipCurrent       bool                            `json:"-"`     // Set this to true so the manager will abort distributing the current song on its next loop
-}
-
-func (c Channel) BroadcastMessage(messageType int, data []byte) error {
-	var err error
-	for _, user := range c.Users {
-		if user.WSConn == nil {
-			continue
-		}
-		err = user.WSConn.WriteMessage(messageType, data)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (c Channel) CheckUsersStillAlive() {
-	var err error
-	for _, user := range c.Users {
-		pingData, _ := json.Marshal(websocketCommand{
-			Command: commandPing,
-		})
-		if user.WSConn == nil {
-			continue
-		}
-		err = user.WSConn.WriteMessage(websocket.TextMessage, pingData)
-		if err != nil {
-			delete(c.Users, user.ID)
-		}
-	}
-}
-
-type User struct {
-	ID       int             `json:"id"`
-	Nickname string          `json:"nickname"`
-	WSConn   *websocket.Conn `json:"-"`
-}
-
-type QueueItem struct {
-	User  User                 `json:"user"`
-	Video youtube.YoutubeVideo `json:"video"`
-}
-
 // WebSocket Command Interface models
 type websocketCommand struct {
 	Command string `json:"command"`
+}
+
+type websocketDataCommand struct {
+	websocketCommand
+	Data interface{} `json:"data"`
 }

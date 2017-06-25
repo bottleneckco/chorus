@@ -5,6 +5,7 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"model"
 	"net/http"
 	"os"
 	"strconv"
@@ -31,16 +32,16 @@ func createChannel(c *gin.Context) {
 		return
 	}
 
-	users := make(map[int]User)
+	users := make(map[int]model.User)
 	newUserID := 1
-	createdByUser := User{
+	createdByUser := model.User{
 		ID:       newUserID,
 		Nickname: payload.CreatedBy,
 	}
 
 	users[newUserID] = createdByUser
 
-	channel := Channel{
+	channel := model.Channel{
 		ID:                generateAccessCode(),
 		CreatedBy:         newUserID,
 		Name:              payload.Name,
@@ -69,7 +70,16 @@ func createChannel(c *gin.Context) {
 		for numUsers != 0 || len(channel.Queue) > 0 {
 			if len(channel.Queue) == 0 {
 				time.Sleep(time.Second * 2)
-				channel.CheckUsersStillAlive()
+				usersWhoLeft := channel.CheckUsersStillAlive()
+				if len(usersWhoLeft) > 0 {
+					jsonData, _ := json.Marshal(websocketDataCommand{
+						websocketCommand{
+							Command: commandUsersLeft,
+						},
+						usersWhoLeft,
+					})
+					channel.BroadcastMessage(websocket.TextMessage, jsonData)
+				}
 				continue
 			}
 
@@ -181,7 +191,7 @@ func addUserToChannel(c *gin.Context) {
 	users := channel.Users
 
 	newUserID := len(users) + 1
-	newUser := User{
+	newUser := model.User{
 		ID:       newUserID,
 		Nickname: json.Nickname,
 	}

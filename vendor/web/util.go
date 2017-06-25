@@ -2,6 +2,7 @@ package web
 
 import (
 	"math/rand"
+	"model"
 	"sort"
 	"strconv"
 
@@ -20,8 +21,8 @@ func generateAccessCode() string {
 	return e
 }
 
-func getUserByCookies(c *gin.Context) (User, error) {
-	var user User
+func getUserByCookies(c *gin.Context) (model.User, error) {
+	var user model.User
 	userIDStr, err := c.Cookie(cookieKeyUserID)
 	if err != nil {
 		return user, err
@@ -39,7 +40,7 @@ func getUserByCookies(c *gin.Context) (User, error) {
 	return user, nil
 }
 
-func setUserCookie(user User, c *gin.Context) {
+func setUserCookie(user model.User, c *gin.Context) {
 	c.SetCookie(
 		cookieKeyUserID,
 		strconv.Itoa(user.ID),
@@ -61,8 +62,8 @@ func setUserCookie(user User, c *gin.Context) {
 	)
 }
 
-func formatUsersForJson(users map[int]User) []User {
-	var usersArr = make([]User, 0)
+func formatUsersForJson(users map[int]model.User) []model.User {
+	var usersArr = make([]model.User, 0)
 
 	for _, v := range users {
 		usersArr = append(usersArr, v)
