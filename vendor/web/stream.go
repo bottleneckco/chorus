@@ -1,7 +1,6 @@
 package web
 
 import (
-	"errors"
 	"log"
 	"net/http"
 
@@ -25,7 +24,7 @@ func getStream(c *gin.Context) {
 	if !isChannelExists {
 		c.JSON(http.StatusInternalServerError, response{
 			Status: statusError,
-			Error:  errors.New("Channel does not exist"),
+			Error:  "Channel does not exist",
 		})
 		return
 	}
@@ -35,7 +34,7 @@ func getStream(c *gin.Context) {
 		log.Println(err)
 		c.JSON(http.StatusBadRequest, response{
 			Status: statusError,
-			Error:  errors.New("Error retrieving cookies"),
+			Error:  "Error retrieving cookies",
 		})
 		return
 	}

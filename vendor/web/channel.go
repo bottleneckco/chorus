@@ -1,7 +1,6 @@
 package web
 
 import (
-	"errors"
 	"io"
 	"io/ioutil"
 	"log"
@@ -26,7 +25,7 @@ func createChannel(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, response{
 			Status: statusError,
-			Error:  errors.New("Invalid payload"),
+			Error:  "Invalid payload",
 		})
 		return
 	}
@@ -134,7 +133,7 @@ func getChannel(c *gin.Context) {
 	if !isChannelExists {
 		c.JSON(http.StatusInternalServerError, response{
 			Status: statusError,
-			Error:  errors.New("Channel does not exist"),
+			Error:  "Channel does not exist",
 		})
 		return
 	}
@@ -153,7 +152,7 @@ func addUserToChannel(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, response{
 			Status: statusError,
-			Error:  errors.New("Invalid payload"),
+			Error:  "Invalid payload",
 		})
 		return
 	}
@@ -162,7 +161,7 @@ func addUserToChannel(c *gin.Context) {
 	if !isChannelExists {
 		c.JSON(http.StatusInternalServerError, response{
 			Status: statusError,
-			Error:  errors.New("Channel does not exist"),
+			Error:  "Channel does not exist",
 		})
 		return
 	}
@@ -191,7 +190,7 @@ func getUsersInChannel(c *gin.Context) {
 	if !isChannelExists {
 		c.JSON(http.StatusInternalServerError, response{
 			Status: statusError,
-			Error:  errors.New("Channel does not exist"),
+			Error:  "Channel does not exist",
 		})
 		return
 	}
@@ -207,7 +206,7 @@ func getChannelQueue(c *gin.Context) {
 	if !isChannelExists {
 		c.JSON(http.StatusInternalServerError, response{
 			Status: statusError,
-			Error:  errors.New("Channel does not exist"),
+			Error:  "Channel does not exist",
 		})
 		return
 	}
@@ -235,7 +234,7 @@ func addToChannelQueue(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, response{
 			Status: statusError,
-			Error:  errors.New("Invalid payload"),
+			Error:  "Invalid payload",
 		})
 		return
 	}
@@ -244,7 +243,7 @@ func addToChannelQueue(c *gin.Context) {
 	if !isChannelExists {
 		c.JSON(http.StatusInternalServerError, response{
 			Status: statusError,
-			Error:  errors.New("Channel does not exist"),
+			Error:  "Channel does not exist",
 		})
 		return
 	}
@@ -260,7 +259,7 @@ func skipInChannelQueue(c *gin.Context) {
 	if !isChannelExists {
 		c.JSON(http.StatusInternalServerError, response{
 			Status: statusError,
-			Error:  errors.New("Channel does not exist"),
+			Error:  "Channel does not exist",
 		})
 		return
 	}
@@ -270,7 +269,7 @@ func skipInChannelQueue(c *gin.Context) {
 	if err != nil || len(indexStr) == 0 || index < 0 || index > len(channel.Queue)-1 {
 		c.JSON(http.StatusNotAcceptable, response{
 			Status: statusError,
-			Error:  errors.New("Invalid index"),
+			Error:  "Invalid index",
 		})
 		return
 	}

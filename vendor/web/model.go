@@ -30,7 +30,7 @@ type addToChannelQueuePayload struct {
 
 type response struct {
 	Status string `json:"status"`
-	Error  error  `json:"error,omitempty"`
+	Error  string `json:"error,omitempty"`
 }
 
 type channelResponse struct {
