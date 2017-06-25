@@ -1,5 +1,4 @@
 import 'whatwg-fetch';
-
 import * as types from '../constants/action-types';
 import API_ROOT from '../constants/api-url';
 
@@ -7,9 +6,9 @@ const createChannelRequest = () => ({
   type: types.CREATE_CHANNEL_REQUEST
 });
 
-const createChannelSuccess = (res) => ({
+const createChannelSuccess = (data) => ({
   type: types.CREATE_CHANNEL_SUCCESS,
-  response: res
+  data
 });
 
 const createChannelFailure = (error) => ({
@@ -26,13 +25,43 @@ export const createChannel = (data) => (dispatch) => {
       'Content-Type': 'application/json'
     }
   })
-    .then((res) => (
-      res.json()
+    .then((response) => (
+      response.json()
     ))
-    .then((res) => {
-      dispatch(createChannelSuccess(res));
+    .then((json) => {
+      dispatch(createChannelSuccess(json));
     })
-    .catch((err) => {
-      dispatch(createChannelFailure(err));
+    .catch((error) => {
+      dispatch(createChannelFailure(error));
+    });
+};
+
+const fetchChannelRequest = () => ({
+  type: types.FETCH_CHANNEL_REQUEST
+});
+
+const fetchChannelSuccess = (data) => ({
+  type: types.FETCH_CHANNEL_SUCCESS,
+  data
+});
+
+const fetchChannelFailure = (error) => ({
+  type: types.FETCH_CHANNEL_FAILURE,
+  error
+});
+
+export const fetchChannel = (channelId) => (dispatch) => {
+  dispatch(fetchChannelRequest());
+  return fetch(`${API_ROOT}/api/channels/${channelId}`, {
+    method: 'GET'
+  })
+    .then((response) => (
+      response.json()
+    ))
+    .then((json) => {
+      dispatch(fetchChannelSuccess(json));
+    })
+    .catch((error) => {
+      dispatch(fetchChannelFailure(error));
     });
 };

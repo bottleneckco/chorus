@@ -71,5 +71,5 @@ const queue = () => {
 
 export default queue;
 
-export const getIsFetching = (state) => state.queue.isFetching;
+export const getQueueIsFetching = (state) => state.queue.isFetching;
 export const getQueue = (state) => state.queue.data;

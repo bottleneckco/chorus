@@ -4,10 +4,11 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import { WS_ROOT } from '../constants/api-url';
-import { getResponse } from '../reducers/reducer-channel';
 import { getRehydrationStatus } from '../reducers/reducer-persistence';
+import { fetchChannel } from '../actions/action-channel';
 import { fetchQueue } from '../actions/action-queue';
-import { getQueue, getIsFetching } from '../reducers/reducer-queue';
+import { getData, getChannelIsFetching } from '../reducers/reducer-channel';
+import { getQueue, getQueueIsFetching } from '../reducers/reducer-queue';
 
 import Nav from '../components/Nav';
 import Player from '../components/Player';
@@ -105,16 +106,21 @@ class Channel extends Component {
   }
 
   componentWillMount() {
-    this.props.fetchQueue(this.props.response.channel.id);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (this.props.isFetching && !nextProps.isFetching) {
-      console.log(nextProps.queue);
+    const { data } = this.props;
+    if (data.status === 'ok') {
+      this.props.fetchQueue(this.props.data.channel.id);
+    } else {
+      this.props.fetchChannel(this.props.match.params.hash);
     }
   }
 
   render() {
+    const { data, channelIsFetching, queue } = this.props;
+
+    if (channelIsFetching || data.status !== 'ok') {
+      return <div>Loading...</div>;
+    }
+
     return (
       <div className="channel">
         <Nav title={this.props.response.name} />
@@ -126,25 +132,33 @@ class Channel extends Component {
 }
 
 Channel.defaultProps = {
-  response: {}
+  data: {}
 };
 
 Channel.propTypes = {
-  response: PropTypes.object,
+  match: PropTypes.object.isRequired,
+
+  data: PropTypes.object,
+  channelIsFetching: PropTypes.bool.isRequired,
   queue: PropTypes.array.isRequired,
-  isFetching: PropTypes.bool.isRequired,
+  queueIsFetching: PropTypes.bool.isRequired,
+
+  fetchChannel: PropTypes.func.isRequired,
   fetchQueue: PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) => ({
   response: getResponse(state),
   rehydrated: getRehydrationStatus(state),
+  data: getData(state),
+  channelIsFetching: getChannelIsFetching(state),
   queue: getQueue(state),
-  isFetching: getIsFetching(state)
+  queueIsFetching: getQueueIsFetching(state)
 });
 
 const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
+    fetchChannel,
     fetchQueue
   }, dispatch)
 );
