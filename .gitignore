@@ -25,3 +25,4 @@ vendor/*/
 !vendor/ffmpeg/*/
 !vendor/web/*/
 !vendor/youtube/*/
+!vendor/vendor.json
