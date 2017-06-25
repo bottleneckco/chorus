@@ -29,9 +29,9 @@ const channel = () => {
   const data = (state = {}, action) => {
     switch (action.type) {
       case types.CREATE_CHANNEL_SUCCESS:
-        return action.response.channel;
+        return action.data.channel;
       case types.FETCH_CHANNEL_SUCCESS:
-        return action.response.channel;
+        return action.data.channel;
       default:
         return state;
     }
@@ -48,4 +48,4 @@ export default channel;
 
 export const getChannelIsCreating = (state) => state.channel.isCreating;
 export const getChannelIsFetching = (state) => state.channel.isFetching;
-export const getData = (state) => state.channel.data;
+export const getChannelData = (state) => state.channel.data;

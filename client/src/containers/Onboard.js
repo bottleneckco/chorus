@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
-import { getChannelIsCreating, getData } from '../reducers/reducer-channel';
+import { getChannelIsCreating, getChannelData } from '../reducers/reducer-channel';
 import { createChannel } from '../actions/action-channel';
 import Header from '../components/Header';
 import '../stylesheets/onboard.scss';
@@ -24,7 +24,7 @@ class Onboard extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (this.props.isCreating && !nextProps.isCreating) {
-      this.props.history.push(nextProps.response.id);
+      this.props.history.push(nextProps.data.id);
     }
   }
 
@@ -90,20 +90,19 @@ class Onboard extends Component {
 }
 
 Onboard.defaultProps = {
-  isCreating: false,
   data: {}
 };
 
 Onboard.propTypes = {
-  createChannel: PropTypes.func.isRequired,
   history: PropTypes.object.isRequired,
-  isCreating: PropTypes.bool,
+  createChannel: PropTypes.func.isRequired,
+  isCreating: PropTypes.bool.isRequired,
   data: PropTypes.object
 };
 
 const mapStateToProps = (state) => ({
   isCreating: getChannelIsCreating(state),
-  data: getData(state)
+  data: getChannelData(state)
 });
 
 const mapDispatchToProps = (dispatch) => (

@@ -7,7 +7,7 @@ import { WS_ROOT } from '../constants/api-url';
 import { getRehydrationStatus } from '../reducers/reducer-persistence';
 import { fetchChannel } from '../actions/action-channel';
 import { fetchQueue } from '../actions/action-queue';
-import { getData, getChannelIsFetching } from '../reducers/reducer-channel';
+import { getChannelData, getChannelIsFetching } from '../reducers/reducer-channel';
 import { getQueue, getQueueIsFetching } from '../reducers/reducer-queue';
 
 import Nav from '../components/Nav';
@@ -40,15 +40,29 @@ class Channel extends Component {
     if (this.props.rehydrated) {
       this.initWS();
       this.setState({ rehydrated: true });
-      console.log('compoinentwillmount');
     }
+
+    const { data } = this.props;
+    console.log(data);
+    // if (data.status === 'ok') {
+    //   this.props.fetchQueue(this.props.data.channel.id);
+    // } else {
+    //   this.props.fetchChannel(this.props.match.params.hash);
+    // }
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.rehydrated && !this.state.rehydrated) {
       this.initWS();
       this.setState({ rehydrated: true });
-      console.log('componentWillreceiveipoprs');
+
+      const { data, match } = this.props;
+
+      if (Object.prototype.hasOwnProperty.call(data, 'id')) {
+        this.props.fetchQueue(data.id);
+      } else {
+        this.props.fetchChannel(match.params.hash);
+      }
     }
   }
 
@@ -56,7 +70,7 @@ class Channel extends Component {
     document.cookie = 'user_id=1; path=/;'; // Fake cookie
     document.cookie = 'user_nickname=Harry; path=/;'; // Fake cookie
 
-    const channelId = this.props.response.id;
+    const channelId = this.props.match.params.hash;
     this.socket = new WebSocket(`${WS_ROOT}/api/channels/${channelId}/stream`, 'GET');
     console.log('Initializing WS connection');
 
@@ -105,27 +119,20 @@ class Channel extends Component {
     this.socket.send('resume');
   }
 
-  componentWillMount() {
-    const { data } = this.props;
-    if (data.status === 'ok') {
-      this.props.fetchQueue(this.props.data.channel.id);
-    } else {
-      this.props.fetchChannel(this.props.match.params.hash);
-    }
-  }
-
   render() {
     const { data, channelIsFetching, queue } = this.props;
 
-    if (channelIsFetching || data.status !== 'ok') {
+    console.log(channelIsFetching, !this.state.rehydrated);
+
+    if (channelIsFetching || Object.keys(data).length === 0) {
       return <div>Loading...</div>;
     }
 
     return (
       <div className="channel">
-        <Nav title={this.props.response.name} />
+        <Nav title={data.name} />
         <Player pause={this.pause} resume={this.resume} />
-        <Queue queue={this.props.queue} />
+        <Queue queue={queue} />
       </div>
     );
   }
@@ -137,6 +144,7 @@ Channel.defaultProps = {
 
 Channel.propTypes = {
   match: PropTypes.object.isRequired,
+  rehydrated: PropTypes.bool.isRequired,
 
   data: PropTypes.object,
   channelIsFetching: PropTypes.bool.isRequired,
@@ -148,9 +156,8 @@ Channel.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-  response: getResponse(state),
   rehydrated: getRehydrationStatus(state),
-  data: getData(state),
+  data: getChannelData(state),
   channelIsFetching: getChannelIsFetching(state),
   queue: getQueue(state),
   queueIsFetching: getQueueIsFetching(state)
