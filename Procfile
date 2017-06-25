@@ -1,1 +1,1 @@
-web: go run main.go
+web: reactriot2017-chorus
