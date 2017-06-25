@@ -3,7 +3,12 @@ package web
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
+
+	"strings"
+
+	"net/http/httputil"
 
 	"github.com/gin-gonic/gin"
 	"github.com/itsjamie/gin-cors"
@@ -20,6 +25,21 @@ func StartServer() {
 	router.Use(
 		func(c *gin.Context) {
 			c.Header("Access-Control-Allow-Origin", "*")
+		},
+	)
+
+	reverseProxy := httputil.NewSingleHostReverseProxy(&url.URL{
+		Scheme: "http",
+		Host:   "localhost:8000",
+	})
+
+	router.Use(
+		func(c *gin.Context) {
+			if strings.HasPrefix(c.Request.URL.EscapedPath(), "/api") {
+				c.Next()
+			} else {
+				reverseProxy.ServeHTTP(c.Writer, c.Request)
+			}
 		},
 	)
 
