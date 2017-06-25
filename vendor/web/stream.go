@@ -8,6 +8,8 @@ import (
 	"encoding/json"
 	"time"
 
+	"strings"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
@@ -64,10 +66,12 @@ func getStream(c *gin.Context) {
 				Command: commandPing,
 			})
 			if err = ws.WriteMessage(websocket.TextMessage, pingData); err != nil {
-				// Error writing, probably user disconnected
-				log.Println(err)
-				delete(channel.Users, user.ID)
-				break
+				if !strings.Contains(err.Error(), "concurrent") { // Ignore concurrent errors
+					// Error writing, probably user disconnected
+					log.Println(err)
+					delete(channel.Users, user.ID)
+					break
+				}
 			}
 		}
 	}(ws)
