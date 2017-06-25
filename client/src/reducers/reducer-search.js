@@ -30,3 +30,6 @@ const search = () => {
 };
 
 export default search;
+
+export const getSearchIsFetching = (state) => state.search.isFetching;
+export const getResults = (state) => state.search.results;
