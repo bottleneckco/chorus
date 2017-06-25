@@ -24,7 +24,7 @@ class Onboard extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (this.props.isCreating && !nextProps.isCreating) {
-      this.props.history.push(nextProps.response.access_code);
+      this.props.history.push(nextProps.response.id);
     }
   }
 

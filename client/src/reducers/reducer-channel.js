@@ -17,7 +17,7 @@ const channel = () => {
   const response = (state = {}, action) => {
     switch (action.type) {
       case types.CREATE_CHANNEL_SUCCESS:
-        return action.response;
+        return action.response.channel;
       default:
         return state;
     }
