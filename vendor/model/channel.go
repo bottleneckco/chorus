@@ -186,6 +186,9 @@ func (c *Channel) Manager() {
 			continue
 		}
 
+		jsonData, _ := json.Marshal(map[string]string{"command": "updateQueue"})
+		c.BroadcastTextMessage(jsonData)
+
 	segmentLoop:
 		for _, segmentFileName := range encoded.SegmentFileNames {
 			log.Printf("[CM 2.0] Feeding segment '%s'\n", segmentFileName)

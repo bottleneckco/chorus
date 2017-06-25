@@ -23,6 +23,7 @@ class Channel extends Component {
       shouldOnboard: false
     };
 
+    this.fetchQueueWrapper = this.fetchQueueWrapper.bind(this)
     this.submitForm = this.submitForm.bind(this);
   }
 
@@ -54,6 +55,10 @@ class Channel extends Component {
     this.setState({ shouldOnboard: false });
   }
 
+  fetchQueueWrapper() {
+    this.props.fetchQueue(this.props.data.id);
+  }
+
   render() {
     const { data, channelIsFetching, queue, queueIsFetching } = this.props;
 
@@ -70,7 +75,7 @@ class Channel extends Component {
       <WSPlayer
         data={data}
         queue={queue}
-        fetchQueue={() => this.props.fetchQueue(data.id)}
+        fetchQueue={this.fetchQueueWrapper}
         skipQueueItem={this.props.skipQueueItem}
       />
     );

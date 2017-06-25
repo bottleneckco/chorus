@@ -10,6 +10,7 @@ const (
 	commandPing        = "ping"
 	commandSkipCurrent = "skipCurrent"
 	commandUsersLeft   = "usersLeft"
+	commandQueueUpdate = "updateQueue"
 )
 
 // Payload models

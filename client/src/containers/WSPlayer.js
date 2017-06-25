@@ -31,7 +31,6 @@ class WSPlayer extends Component {
     this.skip = this.skip.bind(this);
     this.adjustAudioVol = this.adjustAudioVol.bind(this);
     this.skipQueueItem = this.skipQueueItem.bind(this);
-    this.handleSkipCurrentCmd = this.handleSkipCurrentCmd.bind(this);
   }
 
   componentWillMount() {
@@ -76,7 +75,10 @@ class WSPlayer extends Component {
               break;
             case 'skipCurrent':
               sourceBuffer.remove(sourceBuffer.buffered.start(0), sourceBuffer.buffered.end(0) + 20);
-              this.handleSkipCurrentCmd();
+              break;
+            case 'updateQueue':
+              // console.log("FUCK")
+              this.props.fetchQueue();
               break;
             // case 'ping':
             //   console.log('Received ping from server');
@@ -94,10 +96,6 @@ class WSPlayer extends Component {
     audio.play();
 
     this.audio = audio;
-  }
-
-  handleSkipCurrentCmd() {
-    this.props.fetchQueue();
   }
 
   pause() {

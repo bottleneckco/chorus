@@ -185,6 +185,8 @@ func addToChannelQueue(c *gin.Context) {
 	})
 	channelMap[c.Param("id")] = channel
 
+	channel.BroadcastJSON(websocketCommand{Command: commandQueueUpdate})
+
 	c.JSON(http.StatusOK, response{Status: statusOK})
 }
 
@@ -214,6 +216,8 @@ func skipInChannelQueue(c *gin.Context) {
 	} else {
 		channel.IssueCommand(model.ChannelCommandSkip)
 	}
+
+	channel.BroadcastJSON(websocketCommand{Command: commandQueueUpdate})
 
 	c.JSON(http.StatusOK, response{Status: statusOK})
 }
