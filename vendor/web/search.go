@@ -1,7 +1,6 @@
 package web
 
 import (
-	"errors"
 	"log"
 	"net/http"
 	"youtube"
@@ -24,17 +23,16 @@ func searchMusic(c *gin.Context) {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, response{
 			Status: statusError,
-			Error:  errors.New("Error with service provider"),
+			Error:  "Error with service provider",
 		})
 		return
 	}
 
-	channelID := getChannelIDFromParam(c)
-	channel, isChannelExists := channelMap[channelID]
+	channel, isChannelExists := channelMap[c.Param("id")]
 	if !isChannelExists {
 		c.JSON(http.StatusInternalServerError, response{
 			Status: statusError,
-			Error:  errors.New("Channel does not exist"),
+			Error:  "Channel does not exist",
 		})
 		return
 	}

@@ -1,11 +1,8 @@
 package web
 
 import (
-	"errors"
 	"log"
 	"net/http"
-
-	"strconv"
 
 	"encoding/json"
 	"time"
@@ -23,22 +20,11 @@ var upgrader = websocket.Upgrader{
 }
 
 func getStream(c *gin.Context) {
-	channelID, err := strconv.Atoi(c.Param("id"))
-
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusBadRequest, response{
-			Status: statusError,
-			Error:  errors.New("No channel id"),
-		})
-		return
-	}
-
-	channel, isChannelExists := channelMap[ChannelID(channelID)]
+	channel, isChannelExists := channelMap[c.Param("id")]
 	if !isChannelExists {
 		c.JSON(http.StatusInternalServerError, response{
 			Status: statusError,
-			Error:  errors.New("Channel does not exist"),
+			Error:  "Channel does not exist",
 		})
 		return
 	}
@@ -48,7 +34,7 @@ func getStream(c *gin.Context) {
 		log.Println(err)
 		c.JSON(http.StatusBadRequest, response{
 			Status: statusError,
-			Error:  errors.New("Error retrieving cookies"),
+			Error:  "Error retrieving cookies",
 		})
 		return
 	}

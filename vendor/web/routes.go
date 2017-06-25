@@ -9,7 +9,7 @@ import (
 	"github.com/itsjamie/gin-cors"
 )
 
-var channelMap = make(map[ChannelID]*Channel)
+var channelMap = make(map[string]*Channel)
 
 // StartServer yay
 func StartServer() {
