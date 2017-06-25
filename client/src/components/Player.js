@@ -1,5 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Slider from 'rc-slider';
+import 'rc-slider/assets/index.css';
+
 import shareIcon from '../assets/images/share.svg';
 import pauseIcon from '../assets/images/pause.svg';
 import playIcon from '../assets/images/play.svg';
@@ -24,6 +27,7 @@ const Player = (props) => (
       />
       <img className="control control-side" src={skipIcon} alt="skip" />
     </div>
+    <Slider min={0} max={100} defaultValue={80} />
   </div>
 );
 

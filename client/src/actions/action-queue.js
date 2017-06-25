@@ -19,13 +19,16 @@ export const fetchQueue = (queueId) => (dispatch) => {
   dispatch(fetchQueueRequest());
   return fetch(`${API_ROOT}/api/channels/${queueId}/queue`, {
     method: 'GET'
-  }).then((response) => (
-    response.json()
-  )).then((json) => {
-    dispatch(fetchQueueSuccess(json));
-  }).catch((err) => {
-    dispatch(fetchQueueFailure(err));
-  });
+  })
+    .then((response) => (
+      response.json()
+    ))
+    .then((json) => {
+      dispatch(fetchQueueSuccess(json));
+    })
+    .catch((err) => {
+      dispatch(fetchQueueFailure(err));
+    });
 };
 
 const addToQueueRequest = () => ({
@@ -49,17 +52,20 @@ export const addToQueue = (channelId, data) => (dispatch) => {
     headers: {
       'Content-Type': 'application/json'
     }
-  }).then((response) => (
-    response.json()
-  )).then((json) => {
-    if (json.status === 'ok') {
-      dispatch(addToQueueSuccess());
-    } else {
-      dispatch(addToQueueFailure(json));
-    }
-  }).catch((err) => {
-    dispatch(addToQueueFailure(err));
-  });
+  })
+    .then((response) => (
+      response.json()
+    ))
+    .then((json) => {
+      if (json.status === 'ok') {
+        dispatch(addToQueueSuccess());
+      } else {
+        dispatch(addToQueueFailure(json));
+      }
+    })
+    .catch((err) => {
+      dispatch(addToQueueFailure(err));
+    });
 };
 
 const skipQueueItemRequest = () => ({
@@ -80,15 +86,18 @@ export const skipQueue = (channelId, index) => (dispatch) => {
   dispatch(skipQueueItemRequest());
   return fetch(`${API_ROOT}/api/channels/${channelId}/queue/${index}`, {
     method: 'DELETE'
-  }).then((response) => (
-    response.json()
-  )).then((json) => {
-    if (json.status === 'ok') {
-      dispatch(skipQueueItemSuccess());
-    } else {
-      dispatch(skipQueueItemFailure(json));
-    }
-  }).catch((err) => {
-    dispatch(skipQueueItemFailure(err));
-  });
+  })
+    .then((response) => (
+      response.json()
+    ))
+    .then((json) => {
+      if (json.status === 'ok') {
+        dispatch(skipQueueItemSuccess());
+      } else {
+        dispatch(skipQueueItemFailure(json));
+      }
+    })
+    .catch((err) => {
+      dispatch(skipQueueItemFailure(err));
+    });
 };

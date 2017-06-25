@@ -12,8 +12,9 @@ const createChannelSuccess = (res) => ({
   response: res
 });
 
-const createChannelFailure = () => ({
-  type: types.CREATE_CHANNEL_FAILURE
+const createChannelFailure = (error) => ({
+  type: types.CREATE_CHANNEL_FAILURE,
+  error
 });
 
 export const createChannel = (data) => (dispatch) => {
@@ -30,10 +31,8 @@ export const createChannel = (data) => (dispatch) => {
     ))
     .then((res) => {
       dispatch(createChannelSuccess(res));
-      console.log(res);
     })
     .catch((err) => {
-      dispatch(createChannelFailure());
-      console.log(err);
+      dispatch(createChannelFailure(err));
     });
 };
