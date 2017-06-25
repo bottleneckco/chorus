@@ -70,6 +70,7 @@ class Channel extends Component {
       <WSPlayer
         data={data}
         queue={queue}
+        fetchQueue={() => this.props.fetchQueue(data.id)}
         skipQueueItem={this.props.skipQueueItem}
       />
     );

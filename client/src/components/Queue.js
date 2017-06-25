@@ -16,8 +16,10 @@ class Queue extends Component {
 
   renderSongsInQueue() {
     const { queue, skipQueueItem } = this.props;
+    const songsInQueue = queue.slice();
+    songsInQueue.shift();
 
-    return queue.map((item, index) => (
+    return songsInQueue.map((item, index) => (
       <div key={item.id} className="item">
         <span className="col--song">{item.video.name}</span>
         <span className="col--user">{item.user.nickname}</span>
