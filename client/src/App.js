@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 
 import Landing from './containers/Landing';
-import Onboard from './containers/Onboard';
+import Create from './containers/Create';
 import Channel from './containers/Channel';
 
 import './stylesheets/normalize.css';
@@ -19,8 +19,8 @@ const App = () => (
           render={(props) => <Landing {...props} />}
         />
         <Route
-          path="/onboard"
-          render={(props) => <Onboard {...props} />}
+          path="/create"
+          render={(props) => <Create {...props} />}
         />
         <Route
           path="/:hash"

@@ -1,40 +1,15 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
-
-import { getChannelIsCreating, getChannelData } from '../reducers/reducer-channel';
-import { createChannel } from '../actions/action-channel';
 import Header from '../components/Header';
-import '../stylesheets/onboard.scss';
+import Form from '../components/Form';
 
 class Onboard extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      title: '',
-      nickname: ''
-    };
+    this.state = { nickname: '' };
 
-    this.createChannel = this.createChannel.bind(this);
     this.handleInput = this.handleInput.bind(this);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (this.props.isCreating && !nextProps.isCreating) {
-      this.props.history.push(nextProps.data.id);
-    }
-  }
-
-  createChannel(e) {
-    e.preventDefault();
-
-    this.props.createChannel({
-      name: this.state.title,
-      created_by: this.state.nickname
-    });
   }
 
   handleInput(e) {
@@ -44,71 +19,31 @@ class Onboard extends Component {
   }
 
   render() {
-    const { title, nickname } = this.state;
+    const fields = [{
+      label: 'Set your nickname',
+      name: 'nickname',
+      value: this.state.nickname
+    }];
 
     return (
       <div className="onboard">
         <Header large={false} />
         <div className="onboard--content">
-          <h1>Let&apos;s get this party started</h1>
-
-          <form
-            autoComplete="off"
-            className="onboard--form"
-            onSubmit={this.createChannel}
-          >
-            <div className="fields">
-              <h3>Give your channel a title</h3>
-              <input
-                type="text"
-                name="title"
-                value={title}
-                className="textbox-line"
-                onChange={this.handleInput}
-              />
-              <h3>Set your nickname</h3>
-              <input
-                type="text"
-                name="nickname"
-                value={nickname}
-                className="textbox-line"
-                onChange={this.handleInput}
-              />
-            </div>
-            <h3>
-              <input
-                type="submit"
-                value="Create"
-                className="button-solid"
-              />
-            </h3>
-          </form>
+          <h1 className="onboard--heading">Join the fun!</h1>
+          <Form
+            fields={fields}
+            handleInput={this.handleInput}
+            submitForm={this.props.submitForm}
+            submitButtonText="Join"
+          />
         </div>
       </div>
     );
   }
 }
 
-Onboard.defaultProps = {
-  data: {}
-};
-
 Onboard.propTypes = {
-  history: PropTypes.object.isRequired,
-  createChannel: PropTypes.func.isRequired,
-  isCreating: PropTypes.bool.isRequired,
-  data: PropTypes.object
+  submitForm: PropTypes.func.isRequired
 };
 
-const mapStateToProps = (state) => ({
-  isCreating: getChannelIsCreating(state),
-  data: getChannelData(state)
-});
-
-const mapDispatchToProps = (dispatch) => (
-  bindActionCreators({
-    createChannel
-  }, dispatch)
-);
-
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Onboard));
+export default Onboard;

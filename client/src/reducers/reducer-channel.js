@@ -32,6 +32,14 @@ const channel = () => {
         return action.data.channel;
       case types.FETCH_CHANNEL_SUCCESS:
         return action.data.channel;
+      case types.ADD_USER_TO_CHANNEL_SUCCESS:
+        return {
+          ...state,
+          users: [
+            ...state.users,
+            action.data
+          ]
+        };
       default:
         return state;
     }

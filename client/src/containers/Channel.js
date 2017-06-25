@@ -10,20 +10,22 @@ import { fetchQueue } from '../actions/action-queue';
 import { getChannelData, getChannelIsFetching } from '../reducers/reducer-channel';
 import { getQueue, getQueueIsFetching } from '../reducers/reducer-queue';
 
+import Onboard from '../containers/Onboard';
+import Form from '../components/Form';
 import Nav from '../components/Nav';
 import Player from '../components/Player';
 import Queue from '../components/Queue';
 import '../stylesheets/channel.scss';
 
 const convertToArrayBuffer = (data) => (
-    new Promise((resolve) => {
-      const fileReader = new FileReader();
-      fileReader.onload = () => {
-        resolve(this.result);
-      };
-      fileReader.readAsArrayBuffer(data);
-    })
-  );
+  new Promise((resolve) => {
+    const fileReader = new FileReader();
+    fileReader.onload = () => {
+      resolve(this.result);
+    };
+    fileReader.readAsArrayBuffer(data);
+  })
+);
 
 class Channel extends Component {
   constructor(props) {
@@ -31,12 +33,15 @@ class Channel extends Component {
 
     this.state = {
       rehydrated: false,
-      playing: true
+      playing: true,
+      shouldOnboard: false
     };
 
     this.initWS = this.initWS.bind(this);
     this.pause = this.pause.bind(this);
     this.resume = this.resume.bind(this);
+
+    this.handleInput = this.handleInput.bind(this);
   }
 
   componentWillMount() {
@@ -57,6 +62,7 @@ class Channel extends Component {
         this.props.fetchQueue(data.id);
       } else {
         this.props.fetchChannel(match.params.hash);
+        this.setState({ shouldOnboard: true });
       }
     }
   }
@@ -113,11 +119,26 @@ class Channel extends Component {
     this.socket.send('resume');
   }
 
+  handleInput(e) {
+    this.setState({
+      [e.target.name]: e.target.value
+    });
+  }
+
+  submitForm(e) {
+    e.preventDefault();
+    console.log('submitform here');
+  }
+
   render() {
     const { data, channelIsFetching, queue } = this.props;
 
     if (channelIsFetching || Object.keys(data).length === 0) {
       return <div>Loading...</div>;
+    }
+
+    if (this.state.shouldOnboard) {
+      return <Onboard submitForm={this.submitForm} />;
     }
 
     return (
