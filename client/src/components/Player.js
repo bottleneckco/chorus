@@ -9,7 +9,7 @@ import playIcon from '../assets/images/play.svg';
 import skipIcon from '../assets/images/skip.svg';
 import '../stylesheets/player.scss';
 
-const Player = ({ resume, pause, playing }) => {
+const Player = ({ resume, pause, playing, adjustAudioVol }) => {
   const renderPlayPause = () => {
     const icon = playing ? pauseIcon : playIcon;
     const onClick = playing ? pause : resume;
@@ -37,7 +37,7 @@ const Player = ({ resume, pause, playing }) => {
         {renderPlayPause()}
         <img className="control control-side" src={skipIcon} alt="skip" />
       </div>
-      <Slider min={0} max={100} defaultValue={80} />
+      <Slider min={0} max={100} defaultValue={80} onChange={adjustAudioVol} />
     </div>
   );
 };
@@ -45,7 +45,8 @@ const Player = ({ resume, pause, playing }) => {
 Player.propTypes = {
   resume: PropTypes.func.isRequired,
   pause: PropTypes.func.isRequired,
-  playing: PropTypes.bool.isRequired
+  playing: PropTypes.bool.isRequired,
+  adjustAudioVol: PropTypes.func.isRequired
 };
 
 export default Player;
