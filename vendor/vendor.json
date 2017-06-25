@@ -3,6 +3,12 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "WBCkV1yTg/nbmiEcQ9Q3iW93a5o=",
+			"path": "github.com/gin-contrib/static",
+			"revision": "986b610925a822771d6c475a6246ffa913085c7b",
+			"revisionTime": "2017-03-15T11:49:17Z"
+		},
+		{
 			"checksumSHA1": "bvHZOqZm2Gl0XkMh4oOB8iZ7geQ=",
 			"path": "github.com/gin-gonic/gin",
 			"revision": "d5b353c5d5a560322e6d96121c814115562501f7",
@@ -81,5 +87,5 @@
 			"revisionTime": "2017-04-07T17:21:22Z"
 		}
 	],
-	"rootPath": "github.com/chesterhow/reactriot2017-chorus"
+	"rootPath": "github.com/duncanleo/reactriot2017-chorus"
 }
