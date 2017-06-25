@@ -1,0 +1,26 @@
+.nav {
+  left: 0;
+  padding: 0 30px;
+  position: absolute;
+  top: 0;
+  width: 100%;
+
+  &--logo {
+    height: 70px;
+    margin: 20px 10px 20px 0;
+    vertical-align: middle;
+  }
+
+  &--text {
+    display: inline-block;
+    font-weight: 700;
+    vertical-align: middle;
+
+    &-right {
+      position: absolute;
+      right: 30px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  }
+}
