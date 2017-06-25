@@ -57,13 +57,10 @@ type searchResponse struct {
 
 // Data models
 
-type ChannelID int
-
 type Channel struct {
-	ID                ChannelID                       `json:"id"`
+	ID                string                          `json:"id"`
 	Name              string                          `json:"name"`
 	Description       string                          `json:"description"`
-	AccessCode        string                          `json:"access_code"`
 	CreatedBy         int                             `json:"created_by"`
 	VideoResultsCache map[string]youtube.YoutubeVideo `json:"-"`
 	Queue             []youtube.YoutubeVideo          `json:"-"`

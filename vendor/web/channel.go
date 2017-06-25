@@ -41,18 +41,17 @@ func createChannel(c *gin.Context) {
 	users[newUserID] = createdByUser
 
 	channel := Channel{
-		ID:                getNextChannelID(),
+		ID:                generateAccessCode(),
 		CreatedBy:         newUserID,
 		Name:              json.Name,
 		Description:       json.Description,
-		AccessCode:        generateAccessCode(),
 		Users:             users,
 		VideoResultsCache: make(map[string]youtube.YoutubeVideo),
 		Queue:             make([]youtube.YoutubeVideo, 0),
 	}
 
 	setUserCookie(createdByUser, c)
-	channelMap[getNextChannelID()] = &channel
+	channelMap[channel.ID] = &channel
 
 	// Populate usersArr for view
 	channel.UsersArray = formatUsersForJson(users)
@@ -131,8 +130,15 @@ func createChannel(c *gin.Context) {
 }
 
 func getChannel(c *gin.Context) {
-	channelID := getChannelIDFromParam(c)
-	channel := channelMap[channelID]
+	channel, isChannelExists := channelMap[c.Param("id")]
+	if !isChannelExists {
+		c.JSON(http.StatusInternalServerError, response{
+			Status: statusError,
+			Error:  errors.New("Channel does not exist"),
+		})
+		return
+	}
+
 	channel.UsersArray = formatUsersForJson(channel.Users)
 
 	c.JSON(http.StatusOK, channelResponse{
@@ -142,8 +148,6 @@ func getChannel(c *gin.Context) {
 }
 
 func addUserToChannel(c *gin.Context) {
-	channelID := getChannelIDFromParam(c)
-
 	var json createUserPayload
 	err := c.BindJSON(&json)
 	if err != nil {
@@ -154,7 +158,15 @@ func addUserToChannel(c *gin.Context) {
 		return
 	}
 
-	channel := channelMap[channelID]
+	channel, isChannelExists := channelMap[c.Param("id")]
+	if !isChannelExists {
+		c.JSON(http.StatusInternalServerError, response{
+			Status: statusError,
+			Error:  errors.New("Channel does not exist"),
+		})
+		return
+	}
+
 	users := channel.Users
 
 	newUserID := len(users) + 1
@@ -166,7 +178,7 @@ func addUserToChannel(c *gin.Context) {
 	users[newUserID] = newUser
 
 	channel.Users = users
-	channelMap[channelID] = channel
+	channelMap[c.Param("id")] = channel
 
 	// Populate usersArr for view
 	channel.UsersArray = formatUsersForJson(users)
@@ -175,16 +187,23 @@ func addUserToChannel(c *gin.Context) {
 }
 
 func getUsersInChannel(c *gin.Context) {
-	channelID := getChannelIDFromParam(c)
+	channel, isChannelExists := channelMap[c.Param("id")]
+	if !isChannelExists {
+		c.JSON(http.StatusInternalServerError, response{
+			Status: statusError,
+			Error:  errors.New("Channel does not exist"),
+		})
+		return
+	}
+
 	c.JSON(http.StatusOK, channelListUsersResponse{
 		response: response{Status: statusOK},
-		Users:    formatUsersForJson(channelMap[channelID].Users),
+		Users:    formatUsersForJson(channel.Users),
 	})
 }
 
 func getChannelQueue(c *gin.Context) {
-	channelID := getChannelIDFromParam(c)
-	channel, isChannelExists := channelMap[channelID]
+	channel, isChannelExists := channelMap[c.Param("id")]
 	if !isChannelExists {
 		c.JSON(http.StatusInternalServerError, response{
 			Status: statusError,
@@ -221,8 +240,7 @@ func addToChannelQueue(c *gin.Context) {
 		return
 	}
 
-	channelID := getChannelIDFromParam(c)
-	channel, isChannelExists := channelMap[channelID]
+	channel, isChannelExists := channelMap[c.Param("id")]
 	if !isChannelExists {
 		c.JSON(http.StatusInternalServerError, response{
 			Status: statusError,
@@ -232,14 +250,13 @@ func addToChannelQueue(c *gin.Context) {
 	}
 
 	channel.Queue = append(channel.Queue, channel.VideoResultsCache[payload.URL])
-	channelMap[channelID] = channel
+	channelMap[c.Param("id")] = channel
 
 	c.JSON(http.StatusOK, response{Status: statusOK})
 }
 
 func skipInChannelQueue(c *gin.Context) {
-	channelID := getChannelIDFromParam(c)
-	channel, isChannelExists := channelMap[channelID]
+	channel, isChannelExists := channelMap[c.Param("id")]
 	if !isChannelExists {
 		c.JSON(http.StatusInternalServerError, response{
 			Status: statusError,
@@ -260,7 +277,7 @@ func skipInChannelQueue(c *gin.Context) {
 
 	// I know
 	channel.Queue = append(channel.Queue[:index], channel.Queue[index+1:]...)
-	channelMap[channelID] = channel
+	channelMap[c.Param("id")] = channel
 
 	c.JSON(http.StatusOK, response{Status: statusOK})
 }

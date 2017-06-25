@@ -5,8 +5,6 @@ import (
 	"log"
 	"net/http"
 
-	"strconv"
-
 	"encoding/json"
 	"time"
 
@@ -23,18 +21,7 @@ var upgrader = websocket.Upgrader{
 }
 
 func getStream(c *gin.Context) {
-	channelID, err := strconv.Atoi(c.Param("id"))
-
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusBadRequest, response{
-			Status: statusError,
-			Error:  errors.New("No channel id"),
-		})
-		return
-	}
-
-	channel, isChannelExists := channelMap[ChannelID(channelID)]
+	channel, isChannelExists := channelMap[c.Param("id")]
 	if !isChannelExists {
 		c.JSON(http.StatusInternalServerError, response{
 			Status: statusError,
