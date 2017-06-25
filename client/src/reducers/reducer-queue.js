@@ -17,7 +17,7 @@ const queue = () => {
   const data = (state = [], action) => {
     switch (action.type) {
       case types.FETCH_CHANNEL_QUEUE_SUCCESS:
-        return action.data;
+        return action.data.queue;
       default:
         return state;
     }
@@ -70,3 +70,6 @@ const queue = () => {
 };
 
 export default queue;
+
+export const getQueueIsFetching = (state) => state.queue.isFetching;
+export const getQueue = (state) => state.queue.data;

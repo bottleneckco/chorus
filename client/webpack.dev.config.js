@@ -80,6 +80,9 @@ const config = {
   ],
 
   devServer: {
+    host: '0.0.0.0',
+    disableHostCheck: true,
+
     historyApiFallback: true,
     // respond to 404s with index.html
 
