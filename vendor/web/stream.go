@@ -7,13 +7,11 @@ import (
 
 	"strconv"
 
+	"encoding/json"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-)
-
-const (
-	commandPause  = "pause"
-	commandResume = "resume"
 )
 
 var upgrader = websocket.Upgrader{
@@ -45,31 +43,12 @@ func getStream(c *gin.Context) {
 		return
 	}
 
-	userIDStr, err := c.GetCookie(cookieKeyUserID)
+	user, err := getUserByCookies(c)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusBadRequest, response{
 			Status: statusError,
 			Error:  errors.New("Error retrieving cookies"),
-		})
-		return
-	}
-	userID, err := strconv.Atoi(userIDStr)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusBadRequest, response{
-			Status: statusError,
-			Error:  errors.New("Invalid user id"),
-		})
-		return
-	}
-
-	_, isUserExists := channel.Users[userID]
-	if !isUserExists {
-		log.Println(err)
-		c.JSON(http.StatusBadRequest, response{
-			Status: statusError,
-			Error:  errors.New("Invalid user"),
 		})
 		return
 	}
@@ -79,7 +58,6 @@ func getStream(c *gin.Context) {
 			c.Request.Header.Get("Sec-Websocket-Protocol"),
 		},
 	})
-
 	if err != nil {
 		log.Println(err)
 		return
@@ -87,17 +65,21 @@ func getStream(c *gin.Context) {
 
 	defer ws.Close()
 
+	user.WSConn = ws
+	channel.Users[user.ID] = user
+
+	// Test alive function
 	go func(ws *websocket.Conn) {
 		// Copy from channel stream
-		for data := range channel.Stream {
-			log.Printf("Sending out %d bytes\n", len(data))
-			if err = ws.WriteMessage(websocket.BinaryMessage, data); err != nil {
+		ticker := time.NewTicker(time.Second * 10)
+		for range ticker.C {
+			pingData, _ := json.Marshal(websocketCommand{
+				Command: commandPing,
+			})
+			if err = ws.WriteMessage(websocket.TextMessage, pingData); err != nil {
 				// Error writing, probably user disconnected
-
-				// TODO: Delete the user from the channel
-				// TODO: Need a better way to handle this. User refreshes page = lost forever.
-				// delete(channel.Users, userID)
 				log.Println(err)
+				delete(channel.Users, user.ID)
 				break
 			}
 		}
@@ -117,8 +99,16 @@ func getStream(c *gin.Context) {
 
 		switch string(data) {
 		case commandPause:
+			jsonData, _ := json.Marshal(websocketCommand{
+				Command: commandPause,
+			})
+			channel.BroadcastMessage(websocket.TextMessage, jsonData)
 			break
 		case commandResume:
+			jsonData, _ := json.Marshal(websocketCommand{
+				Command: commandResume,
+			})
+			channel.BroadcastMessage(websocket.TextMessage, jsonData)
 			break
 		}
 	}

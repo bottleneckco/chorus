@@ -17,6 +17,7 @@ import (
 	"path"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 )
 
 func createChannel(c *gin.Context) {
@@ -46,12 +47,11 @@ func createChannel(c *gin.Context) {
 		Description:       json.Description,
 		AccessCode:        generateAccessCode(),
 		Users:             users,
-		Stream:            make(chan []byte, 10),
 		VideoResultsCache: make(map[string]youtube.YoutubeVideo),
 		Queue:             make([]youtube.YoutubeVideo, 0),
 	}
 
-	setUserCookie(newUserID, c)
+	setUserCookie(createdByUser, c)
 	channelMap[getNextChannelID()] = &channel
 
 	// Populate usersArr for view
@@ -106,7 +106,14 @@ func createChannel(c *gin.Context) {
 					log.Println(err)
 					continue
 				}
-				channel.Stream <- data
+
+				// Distribute
+				for _, user := range channel.Users {
+					if user.WSConn != nil {
+						user.WSConn.WriteMessage(websocket.BinaryMessage, data)
+					}
+				}
+
 				time.Sleep(time.Millisecond * 2000)
 			}
 

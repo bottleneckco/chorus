@@ -29,12 +29,39 @@ func getNextChannelID() ChannelID {
 	return ChannelID(len(channelMap) + 1)
 }
 
-func setUserCookie(newUserID int, c *gin.Context) {
-	newUserIDStr := strconv.Itoa(newUserID)
+func getUserByCookies(c *gin.Context) (User, error) {
+	var user User
+	userIDStr, err := c.Cookie(cookieKeyUserID)
+	if err != nil {
+		return user, err
+	}
+	userID, err := strconv.Atoi(userIDStr)
+	if err != nil {
+		return user, err
+	}
+	user.ID = userID
+	userNick, err := c.Cookie(cookieKeyUserNickname)
+	if err != nil {
+		return user, err
+	}
+	user.Nickname = userNick
+	return user, nil
+}
 
+func setUserCookie(user User, c *gin.Context) {
 	c.SetCookie(
 		cookieKeyUserID,
-		newUserIDStr,
+		strconv.Itoa(user.ID),
+		0,
+		"/channel",
+		"",
+		false,
+		false,
+	)
+
+	c.SetCookie(
+		cookieKeyUserNickname,
+		user.Nickname,
 		0,
 		"/channel",
 		"",
