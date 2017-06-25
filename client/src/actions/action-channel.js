@@ -1,4 +1,3 @@
-import 'whatwg-fetch';
 import * as types from '../constants/action-types';
 import API_ROOT from '../constants/api-url';
 
@@ -23,7 +22,8 @@ export const createChannel = (data) => (dispatch) => {
     body: JSON.stringify(data),
     headers: {
       'Content-Type': 'application/json'
-    }
+    },
+    credentials: 'same-origin'
   })
     .then((response) => (
       response.json()
@@ -53,7 +53,8 @@ const fetchChannelFailure = (error) => ({
 export const fetchChannel = (channelId) => (dispatch) => {
   dispatch(fetchChannelRequest());
   return fetch(`${API_ROOT}/api/channels/${channelId}`, {
-    method: 'GET'
+    method: 'GET',
+    credentials: 'same-origin'
   })
     .then((response) => (
       response.json()

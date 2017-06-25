@@ -62,9 +62,6 @@ class Channel extends Component {
   }
 
   initWS() {
-    document.cookie = 'user_id=1; path=/;'; // Fake cookie
-    document.cookie = 'user_nickname=Harry; path=/;'; // Fake cookie
-
     const channelId = this.props.match.params.hash;
     this.socket = new WebSocket(`${WS_ROOT}/api/channels/${channelId}/stream`, 'GET');
     console.log('Initializing WS connection');

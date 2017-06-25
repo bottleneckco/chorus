@@ -19,7 +19,8 @@ const searchMusicFailure = (error) => ({
 export const searchMusic = (channelId, term) => (dispatch) => {
   dispatch(searchMusicRequest());
   return fetch(`${API_ROOT}/api/channels/${channelId}/search?term=${term}`, {
-    method: 'GET'
+    method: 'GET',
+    credentials: 'same-origin'
   }).then((response) => (
     response.json()
   )).then((json) => {
