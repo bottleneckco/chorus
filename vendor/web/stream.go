@@ -54,7 +54,7 @@ func getStream(c *gin.Context) {
 	defer ws.Close()
 
 	user.WSConn = model.WSConn{Conn: ws}
-	channel.Users[user.ID] = user
+	channel.I.Users[user.ID] = user
 
 	for {
 		messageType, data, err := ws.ReadMessage()
