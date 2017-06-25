@@ -1,2 +1,2 @@
-export const WS_ROOT = 'ws://localhost:8080';
-export default 'http://localhost:8080';
+export const WS_ROOT = `ws://${window.location.hostname}:8080`;
+export default `http://${window.location.hostname}:8080`;

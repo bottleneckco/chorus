@@ -18,7 +18,7 @@ import '../stylesheets/channel.scss';
 const convertToArrayBuffer = (data) => (
     new Promise((resolve) => {
       const fileReader = new FileReader();
-      fileReader.onload = function () {
+      fileReader.onload = () => {
         resolve(this.result);
       };
       fileReader.readAsArrayBuffer(data);
@@ -29,7 +29,10 @@ class Channel extends Component {
   constructor(props) {
     super(props);
 
-    this.state = { rehydrated: false };
+    this.state = {
+      rehydrated: false,
+      playing: true
+    };
 
     this.initWS = this.initWS.bind(this);
     this.pause = this.pause.bind(this);
@@ -41,14 +44,6 @@ class Channel extends Component {
       this.initWS();
       this.setState({ rehydrated: true });
     }
-
-    const { data } = this.props;
-    console.log(data);
-    // if (data.status === 'ok') {
-    //   this.props.fetchQueue(this.props.data.channel.id);
-    // } else {
-    //   this.props.fetchChannel(this.props.match.params.hash);
-    // }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -90,10 +85,12 @@ class Channel extends Component {
           switch (wsJson.command) {
             case 'pause':
               audio.pause();
+              this.setState({ playing: false });
               console.log('Received pause from server');
               break;
             case 'resume':
               audio.play();
+              this.setState({ playing: true });
               console.log('Received resume from server');
               break;
             // case 'ping':
@@ -122,8 +119,6 @@ class Channel extends Component {
   render() {
     const { data, channelIsFetching, queue } = this.props;
 
-    console.log(channelIsFetching, !this.state.rehydrated);
-
     if (channelIsFetching || Object.keys(data).length === 0) {
       return <div>Loading...</div>;
     }
@@ -131,7 +126,11 @@ class Channel extends Component {
     return (
       <div className="channel">
         <Nav title={data.name} />
-        <Player pause={this.pause} resume={this.resume} />
+        <Player
+          pause={this.pause}
+          resume={this.resume}
+          playing={this.state.playing}
+        />
         <Queue queue={queue} />
       </div>
     );
