@@ -18,7 +18,7 @@ type videoResult struct {
 func searchMusic(c *gin.Context) {
 	query := c.Query("term")
 
-	results, err := youtube.Search(query, 10)
+	results, err := youtube.Search(query, 5)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, response{

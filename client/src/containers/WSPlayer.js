@@ -16,14 +16,14 @@ const convertToArrayBuffer = (data) => (
   })
 );
 
-
 class WSPlayer extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
       playing: true,
-      nextSongs: []
+      nextSongs: [],
+      showSearchBar: true
     };
 
     this.initWS = this.initWS.bind(this);

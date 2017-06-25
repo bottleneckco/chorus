@@ -61,6 +61,7 @@ export const addToQueue = (channelId, data) => (dispatch) => {
     .then((json) => {
       if (json.status === 'ok') {
         dispatch(addToQueueSuccess());
+        dispatch(fetchQueue(channelId));
       } else {
         dispatch(addToQueueFailure(json));
       }

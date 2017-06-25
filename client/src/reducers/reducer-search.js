@@ -18,6 +18,8 @@ const search = () => {
     switch (action.type) {
       case types.SEARCH_MUSIC_SUCCESS:
         return action.data;
+      case types.CLEAR_SEARCH_RESULTS:
+        return [];
       default:
         return state;
     }
@@ -30,3 +32,6 @@ const search = () => {
 };
 
 export default search;
+
+export const getSearchIsFetching = (state) => state.search.isFetching;
+export const getResults = (state) => state.search.results;

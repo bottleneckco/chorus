@@ -33,3 +33,7 @@ export const searchMusic = (channelId, term) => (dispatch) => {
     dispatch(searchMusicFailure(err));
   });
 };
+
+export const clearSearchResults = () => ({
+  type: types.CLEAR_SEARCH_RESULTS
+})

@@ -57,3 +57,4 @@ export default channel;
 export const getChannelIsCreating = (state) => state.channel.isCreating;
 export const getChannelIsFetching = (state) => state.channel.isFetching;
 export const getChannelData = (state) => state.channel.data;
+export const getChannelId = (state) => state.channel.data.id;
