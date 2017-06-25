@@ -6,6 +6,8 @@ import Nav from '../components/Nav';
 import Queue from '../components/Queue';
 import Player from '../components/Player';
 
+import SearchBar from '../containers/SearchBar';
+
 const convertToArrayBuffer = (data) => (
   new Promise((resolve) => {
     const fileReader = new FileReader();
@@ -15,7 +17,6 @@ const convertToArrayBuffer = (data) => (
     fileReader.readAsArrayBuffer(data);
   })
 );
-
 
 class WSPlayer extends Component {
   constructor(props) {
@@ -114,6 +115,7 @@ class WSPlayer extends Component {
           adjustAudioVol={this.adjustAudioVol}
         />
         <Queue queue={this.props.queue} skipQueueItem={this.skipQueueItem} />
+        <SearchBar />
       </div>
     );
   }

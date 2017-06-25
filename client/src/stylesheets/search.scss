@@ -1,0 +1,53 @@
+@import 'variables';
+
+.searchbar {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 200px;
+  
+  &-textbox {
+    border: none;
+    width: 700px;
+    padding: 20px;
+    color: $orange-0;
+    font-size: 1.8em;
+
+    border-radius: 5px;
+  }
+}
+
+.searchitem {
+  width: 700px;
+  height: 110px;
+  background: $white;
+  padding: 20px;
+
+  &-content {
+    color: $red-0;
+  }
+  
+  &-thumbnail {
+    display: inline-block;
+    background: $red-0;
+    width: 142px;
+    height: 80px;
+    border-radius: 2px;
+    vertical-align: middle;    
+  }
+
+  &-details {
+    display: inline-block;
+    vertical-align: middle;
+    padding-left: 12px;
+  }
+
+  &-name {
+    padding-bottom: 10px;
+    font-size: 1.3em;
+  }
+
+  &-duration {
+    font-size: 1em;
+  }
+}
