@@ -18,7 +18,8 @@ const fetchQueueFailure = (error) => ({
 export const fetchQueue = (queueId) => (dispatch) => {
   dispatch(fetchQueueRequest());
   return fetch(`${API_ROOT}/api/channels/${queueId}/queue`, {
-    method: 'GET'
+    method: 'GET',
+    credentials: 'same-origin'
   })
     .then((response) => (
       response.json()
@@ -51,7 +52,8 @@ export const addToQueue = (channelId, data) => (dispatch) => {
     body: JSON.stringify(data),
     headers: {
       'Content-Type': 'application/json'
-    }
+    },
+    credentials: 'same-origin'
   })
     .then((response) => (
       response.json()
@@ -85,7 +87,8 @@ const skipQueueItemFailure = (error) => ({
 export const skipQueue = (channelId, index) => (dispatch) => {
   dispatch(skipQueueItemRequest());
   return fetch(`${API_ROOT}/api/channels/${channelId}/queue/${index}`, {
-    method: 'DELETE'
+    method: 'DELETE',
+    credentials: 'same-origin'
   })
     .then((response) => (
       response.json()

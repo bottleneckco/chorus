@@ -53,8 +53,8 @@ const fetchChannelFailure = (error) => ({
 export const fetchChannel = (channelId) => (dispatch) => {
   dispatch(fetchChannelRequest());
   return fetch(`${API_ROOT}/api/channels/${channelId}`, {
-    method: 'GET'
-    // credentials: 'include'
+    method: 'GET',
+    credentials: 'same-origin'
   })
     .then((response) => (
       response.json()
