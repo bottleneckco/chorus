@@ -46,7 +46,7 @@ func searchMusic(c *gin.Context) {
 			Duration:     result.Duration,
 			URL:          result.WebpageURL,
 		})
-		channel.VideoResultsCache[result.WebpageURL] = result
+		channel.I.VideoResultsCache[result.WebpageURL] = result
 	}
 
 	c.JSON(http.StatusOK, searchResponse{

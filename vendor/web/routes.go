@@ -2,6 +2,7 @@ package web
 
 import (
 	"fmt"
+	"model"
 	"os"
 	"strings"
 
@@ -15,7 +16,7 @@ import (
 	"github.com/itsjamie/gin-cors"
 )
 
-var channelMap = make(map[string]*Channel)
+var channelMap = make(map[string]*model.Channel)
 
 // StartServer yay
 func StartServer() {

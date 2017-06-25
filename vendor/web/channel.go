@@ -1,23 +1,11 @@
 package web
 
 import (
-	"encoding/json"
-	"io"
-	"io/ioutil"
-	"log"
+	"model"
 	"net/http"
-	"os"
 	"strconv"
-	"time"
-
-	"youtube"
-
-	"ffmpeg"
-
-	"path"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
 )
 
 func createChannel(c *gin.Context) {
@@ -31,31 +19,24 @@ func createChannel(c *gin.Context) {
 		return
 	}
 
-	users := make(map[int]User)
 	newUserID := 1
-	createdByUser := User{
+	createdByUser := model.User{
 		ID:       newUserID,
 		Nickname: payload.CreatedBy,
 	}
 
-	users[newUserID] = createdByUser
-
-	channel := Channel{
-		ID:                generateAccessCode(),
-		CreatedBy:         newUserID,
-		Name:              payload.Name,
-		Description:       payload.Description,
-		Users:             users,
-		VideoResultsCache: make(map[string]youtube.YoutubeVideo),
-		Queue:             make([]QueueItem, 0),
-		SkipCurrent:       false,
-	}
+	channel := model.NewChannel(
+		generateAccessCode(),
+		createdByUser,
+		payload.Name,
+		payload.Description,
+	)
 
 	setUserCookie(createdByUser, c)
 	channelMap[channel.ID] = &channel
 
 	// Populate usersArr for view
-	channel.UsersArray = formatUsersForJson(users)
+	channel.UsersArray = formatUsersForJson(channel.I.Users)
 
 	c.JSON(http.StatusOK, channelResponse{
 		response{Status: statusOK},
@@ -63,81 +44,7 @@ func createChannel(c *gin.Context) {
 	})
 
 	// Channel Manager
-	go func() {
-		log.Printf("Channel manager started for Channel '%s'\n", channel.Name)
-		numUsers := 1
-		for numUsers != 0 || len(channel.Queue) > 0 {
-			if len(channel.Queue) == 0 {
-				time.Sleep(time.Second * 2)
-				channel.CheckUsersStillAlive()
-				continue
-			}
-
-			queueItem := channel.Queue[0]
-
-			log.Printf("Downloading file '%s' via URL '%s'\n", queueItem.Video.Fulltitle, queueItem.Video.Formats[0].URL)
-
-			// Download file
-			downloadFile, err := ioutil.TempFile(os.TempDir(), "audio")
-			if err != nil {
-				log.Println(err)
-				continue
-			}
-			resp, err := http.Get(queueItem.Video.Formats[0].URL)
-			if err != nil {
-				log.Println(err)
-				continue
-			}
-
-			defer resp.Body.Close()
-			io.Copy(downloadFile, resp.Body)
-
-			log.Printf("Segmenting '%s'\n", downloadFile.Name())
-
-			encode, err := ffmpeg.Segment(downloadFile.Name())
-			if err != nil {
-				log.Println(err)
-				continue
-			}
-
-			for _, segmentFileName := range encode.SegmentFileNames {
-				log.Printf("Feeding segment '%s'\n", segmentFileName)
-
-				channel.CheckUsersStillAlive()
-
-				data, err := ioutil.ReadFile(path.Join(encode.ContainerDir, segmentFileName))
-				if err != nil {
-					log.Println(err)
-					continue
-				}
-
-				// Distribute
-				channel.BroadcastMessage(websocket.BinaryMessage, data)
-
-				// Check if we should abort distribution of the current song
-				if channel.SkipCurrent {
-					channel.SkipCurrent = false
-					jsonData, _ := json.Marshal(websocketCommand{
-						Command: commandSkipCurrent,
-					})
-					channel.BroadcastMessage(websocket.TextMessage, jsonData)
-					break
-				}
-
-				time.Sleep(time.Millisecond * 4000)
-			}
-
-			numUsers = len(channel.Users)
-			if len(channel.Queue) == 1 {
-				channel.Queue = make([]QueueItem, 0)
-			} else {
-				channel.Queue = channel.Queue[1:]
-			}
-
-			log.Println("Job complete")
-			os.Remove(encode.ContainerDir)
-		}
-	}()
+	go channel.Manager()
 }
 
 func getChannel(c *gin.Context) {
@@ -150,7 +57,7 @@ func getChannel(c *gin.Context) {
 		return
 	}
 
-	channel.UsersArray = formatUsersForJson(channel.Users)
+	channel.UsersArray = formatUsersForJson(channel.I.Users)
 
 	c.JSON(http.StatusOK, channelResponse{
 		response: response{Status: statusOK},
@@ -159,8 +66,8 @@ func getChannel(c *gin.Context) {
 }
 
 func addUserToChannel(c *gin.Context) {
-	var json createUserPayload
-	err := c.BindJSON(&json)
+	var payload createUserPayload
+	err := c.BindJSON(&payload)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, response{
 			Status: statusError,
@@ -178,22 +85,17 @@ func addUserToChannel(c *gin.Context) {
 		return
 	}
 
-	users := channel.Users
-
-	newUserID := len(users) + 1
-	newUser := User{
+	newUserID := len(channel.I.Users) + 1
+	newUser := model.User{
 		ID:       newUserID,
-		Nickname: json.Nickname,
+		Nickname: payload.Nickname,
 	}
 
-	users[newUserID] = newUser
-
-	channel.Users = users
-	channelMap[c.Param("id")] = channel
+	channel.AddUser(&newUser)
 	setUserCookie(newUser, c)
 
 	// Populate usersArr for view
-	channel.UsersArray = formatUsersForJson(users)
+	channel.UsersArray = formatUsersForJson(channel.I.Users)
 
 	c.JSON(http.StatusOK, channelAddUserResponse{
 		response: response{Status: statusOK},
@@ -213,7 +115,7 @@ func getUsersInChannel(c *gin.Context) {
 
 	c.JSON(http.StatusOK, channelListUsersResponse{
 		response: response{Status: statusOK},
-		Users:    formatUsersForJson(channel.Users),
+		Users:    formatUsersForJson(channel.I.Users),
 	})
 }
 
@@ -228,10 +130,10 @@ func getChannelQueue(c *gin.Context) {
 	}
 
 	var jsonArray = make([]channelListQueueItem, 0)
-	for index, queueItem := range channel.Queue {
+	for index, queueItem := range channel.I.Queue.Q {
 		jsonArray = append(jsonArray, channelListQueueItem{
 			ID:   index,
-			User: queueItem.User,
+			User: queueItem.Creator,
 			VideoResult: videoResult{
 				Name:         queueItem.Video.Fulltitle,
 				ThumbnailURL: queueItem.Video.Thumbnail,
@@ -277,9 +179,9 @@ func addToChannelQueue(c *gin.Context) {
 		return
 	}
 
-	channel.Queue = append(channel.Queue, QueueItem{
-		User:  user,
-		Video: channel.VideoResultsCache[payload.URL],
+	channel.I.Queue.AddItem(model.QueueItem{
+		Creator: user,
+		Video:   channel.I.VideoResultsCache[payload.URL],
 	})
 	channelMap[c.Param("id")] = channel
 
@@ -298,7 +200,7 @@ func skipInChannelQueue(c *gin.Context) {
 
 	indexStr := c.Param("index")
 	index, err := strconv.Atoi(indexStr)
-	if err != nil || len(indexStr) == 0 || index < 0 || index > len(channel.Queue)-1 {
+	if err != nil || len(indexStr) == 0 || index < 0 || index > channel.I.Queue.Count()-1 {
 		c.JSON(http.StatusNotAcceptable, response{
 			Status: statusError,
 			Error:  "Invalid index",
@@ -307,10 +209,10 @@ func skipInChannelQueue(c *gin.Context) {
 	}
 
 	// I know
-	if len(channel.Queue) > 1 && index != 0 {
-		channel.Queue = append(channel.Queue[:index], channel.Queue[index+1:]...)
+	if channel.I.Queue.Count() > 1 && index != 0 {
+		channel.I.Queue.RemoveIndex(index)
 	} else {
-		channel.SkipCurrent = true
+		channel.IssueCommand(model.ChannelCommandSkip)
 	}
 
 	c.JSON(http.StatusOK, response{Status: statusOK})
