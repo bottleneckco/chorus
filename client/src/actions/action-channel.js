@@ -1,5 +1,6 @@
 import * as types from '../constants/action-types';
 import API_ROOT from '../constants/api-url';
+import { fetchQueue } from './action-queue';
 
 const createChannelRequest = () => ({
   type: types.CREATE_CHANNEL_REQUEST
@@ -97,6 +98,7 @@ export const addUserToChannel = (channelId, data) => (dispatch) => {
     .then((json) => {
       if (json.status === 'ok') {
         dispatch(addUserToChannelSuccess(json));
+        dispatch(fetchQueue(channelId));
       } else {
         dispatch(addUserToChannelFailure(json));
       }

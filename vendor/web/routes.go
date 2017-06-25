@@ -20,7 +20,7 @@ var channelMap = make(map[string]*Channel)
 func StartServer() {
 	router := gin.Default()
 
-	router.StaticFS("/static", http.Dir("./client/dist/"))
+	router.StaticFS("/", http.Dir("./client/dist/"))
 
 	router.Use(
 		func(c *gin.Context) {

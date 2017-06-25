@@ -22,6 +22,10 @@ class WSPlayer extends Component {
     super(props);
 
     this.state = { playing: true };
+
+    this.initWS = this.initWS.bind(this);
+    this.pause = this.pause.bind(this);
+    this.resume = this.resume.bind(this);
   }
 
   componentWillMount() {
