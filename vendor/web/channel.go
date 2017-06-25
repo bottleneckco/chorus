@@ -69,7 +69,7 @@ func createChannel(c *gin.Context) {
 		for numUsers != 0 || len(channel.Queue) > 0 {
 			if len(channel.Queue) == 0 {
 				time.Sleep(time.Second * 2)
-				channel.SanitiseUsers()
+				channel.CheckUsersStillAlive()
 				continue
 			}
 
@@ -103,7 +103,7 @@ func createChannel(c *gin.Context) {
 			for _, segmentFileName := range encode.SegmentFileNames {
 				log.Printf("Feeding segment '%s'\n", segmentFileName)
 
-				channel.SanitiseUsers()
+				channel.CheckUsersStillAlive()
 
 				data, err := ioutil.ReadFile(path.Join(encode.ContainerDir, segmentFileName))
 				if err != nil {

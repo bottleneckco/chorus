@@ -90,7 +90,7 @@ func (c Channel) BroadcastMessage(messageType int, data []byte) error {
 	return nil
 }
 
-func (c Channel) SanitiseUsers() {
+func (c Channel) CheckUsersStillAlive() {
 	var err error
 	for _, user := range c.Users {
 		pingData, _ := json.Marshal(websocketCommand{
