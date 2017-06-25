@@ -9,7 +9,7 @@ const Landing = () => (
     <div className="landing--content">
       <h1 className="heading">Music sounds better with friends.</h1>
       <h3>
-        <Link className="button-outline" to="/onboard">Get started</Link>
+        <Link className="button-outline" to="/create">Get started</Link>
       </h3>
     </div>
     <span className="landing--company">H & Co.</span>

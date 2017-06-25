@@ -66,3 +66,42 @@ export const fetchChannel = (channelId) => (dispatch) => {
       dispatch(fetchChannelFailure(error));
     });
 };
+
+const addUserToChannelRequest = () => ({
+  type: types.ADD_USER_TO_CHANNEL_REQUEST
+});
+
+const addUserToChannelSuccess = (data) => ({
+  type: types.ADD_USER_TO_CHANNEL_SUCCESS,
+  data
+});
+
+const addUserToChannelFailure = (error) => ({
+  type: types.ADD_USER_TO_CHANNEL_FAILURE,
+  error
+});
+
+export const addUserToChannel = (channelId, data) => (dispatch) => {
+  dispatch(addUserToChannelRequest());
+  return fetch(`${API_ROOT}/api/channels/${channelId}/users`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    credentials: 'same-origin'
+  })
+    .then((response) => (
+      response.json()
+    ))
+    .then((json) => {
+      if (json.status === 'ok') {
+        dispatch(addUserToChannelSuccess(json));
+      } else {
+        dispatch(addUserToChannelFailure(json));
+      }
+    })
+    .catch((error) => {
+      dispatch(addUserToChannelFailure(error));
+    });
+};
