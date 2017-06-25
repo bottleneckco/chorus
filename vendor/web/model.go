@@ -1,14 +1,19 @@
 package web
 
-import "youtube"
-import "github.com/gorilla/websocket"
+import (
+	"encoding/json"
+	"youtube"
+
+	"github.com/gorilla/websocket"
+)
 
 const (
-	statusOK      = "ok"
-	statusError   = "error"
-	commandPause  = "pause"
-	commandResume = "resume"
-	commandPing   = "ping"
+	statusOK           = "ok"
+	statusError        = "error"
+	commandPause       = "pause"
+	commandResume      = "resume"
+	commandPing        = "ping"
+	commandSkipCurrent = "skipCurrent"
 )
 
 // Payload models
@@ -71,6 +76,7 @@ type Channel struct {
 	Queue             []youtube.YoutubeVideo          `json:"-"`
 	Users             map[int]User                    `json:"-"`
 	UsersArray        []User                          `json:"users"` // UsersArray is only for display
+	SkipCurrent       bool                            `json:"-"`     // Set this to true so the manager will abort distributing the current song on its next loop
 }
 
 func (c Channel) BroadcastMessage(messageType int, data []byte) error {
@@ -82,6 +88,19 @@ func (c Channel) BroadcastMessage(messageType int, data []byte) error {
 		}
 	}
 	return nil
+}
+
+func (c Channel) CheckUsersStillAlive() {
+	var err error
+	for _, user := range c.Users {
+		pingData, _ := json.Marshal(websocketCommand{
+			Command: commandPing,
+		})
+		err = user.WSConn.WriteMessage(websocket.TextMessage, pingData)
+		if err != nil {
+			delete(c.Users, user.ID)
+		}
+	}
 }
 
 type User struct {

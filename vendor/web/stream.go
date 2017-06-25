@@ -6,9 +6,6 @@ import (
 	"net/http"
 
 	"encoding/json"
-	"time"
-
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -56,25 +53,6 @@ func getStream(c *gin.Context) {
 
 	user.WSConn = ws
 	channel.Users[user.ID] = user
-
-	// Test alive function
-	go func(ws *websocket.Conn) {
-		// Copy from channel stream
-		ticker := time.NewTicker(time.Millisecond * 3)
-		for range ticker.C {
-			pingData, _ := json.Marshal(websocketCommand{
-				Command: commandPing,
-			})
-			if err = ws.WriteMessage(websocket.TextMessage, pingData); err != nil {
-				if !strings.Contains(err.Error(), "concurrent") { // Ignore concurrent errors
-					// Error writing, probably user disconnected
-					log.Println(err)
-					delete(channel.Users, user.ID)
-					break
-				}
-			}
-		}
-	}(ws)
 
 	for {
 		messageType, data, err := ws.ReadMessage()
