@@ -3,13 +3,16 @@ package web
 import (
 	"fmt"
 	"os"
+	"strings"
 
-	"net/http"
 	"io/ioutil"
+	"net/http"
+	"net/http/httputil"
+	"net/url"
 
+	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/itsjamie/gin-cors"
-	"github.com/gin-contrib/static"
 )
 
 var channelMap = make(map[string]*Channel)
@@ -18,47 +21,51 @@ var channelMap = make(map[string]*Channel)
 func StartServer() {
 	router := gin.Default()
 
-	router.Use(
-		func(c *gin.Context) {
-			urlPath := c.Request.URL.EscapedPath()
-			if len(urlPath) == 0 {
-				c.Next()
-				return
-			}
-			if _, isChannelExists := channelMap[urlPath[1:]]; isChannelExists {
-				data, err := ioutil.ReadFile("./client/dist/index.html")
-				if err != nil {
-					c.AbortWithStatus(http.StatusInternalServerError)
+	// Set GIN_MODE=release to _not_ debug
+	if gin.IsDebugging() {
+		// Reverse proxy to Webpack Dev server
+		reverseProxy := httputil.NewSingleHostReverseProxy(&url.URL{
+			Scheme: "http",
+			Host:   "localhost:8000",
+		})
+
+		router.Use(
+			func(c *gin.Context) {
+				if strings.HasPrefix(c.Request.URL.EscapedPath(), "/api") {
+					c.Next()
+				} else {
+					reverseProxy.ServeHTTP(c.Writer, c.Request)
+				}
+			},
+		)
+	} else {
+		// Serve local files
+		router.Use(
+			func(c *gin.Context) {
+				urlPath := c.Request.URL.EscapedPath()
+				if len(urlPath) == 0 {
+					c.Next()
 					return
 				}
-				c.Data(http.StatusOK, gin.MIMEHTML, data)
-			}
-		},
-	)
+				if _, isChannelExists := channelMap[urlPath[1:]]; isChannelExists {
+					data, err := ioutil.ReadFile("./client/dist/index.html")
+					if err != nil {
+						c.AbortWithStatus(http.StatusInternalServerError)
+						return
+					}
+					c.Data(http.StatusOK, gin.MIMEHTML, data)
+				}
+			},
+		)
+	}
 
 	router.Use(static.Serve("/", static.LocalFile("./client/dist/", true)))
-	// router.StaticFS("/", http.Dir("./client/dist/"))
 
 	router.Use(
 		func(c *gin.Context) {
 			c.Header("Access-Control-Allow-Origin", "*")
 		},
 	)
-
-	// reverseProxy := httputil.NewSingleHostReverseProxy(&url.URL{
-	// 	Scheme: "http",
-	// 	Host:   "localhost:8000",
-	// })
-	//
-	// router.Use(
-	// 	func(c *gin.Context) {
-	// 		if strings.HasPrefix(c.Request.URL.EscapedPath(), "/api") {
-	// 			c.Next()
-	// 		} else {
-	// 			reverseProxy.ServeHTTP(c.Writer, c.Request)
-	// 		}
-	// 	},
-	// )
 
 	router.Use(cors.Middleware(cors.Config{
 		Origins:         "*",
