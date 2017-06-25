@@ -29,7 +29,7 @@ class Queue extends Component {
           alt="skip"
           role="button"
           tabIndex="0"
-          onClick={() => skipQueueItem(index)}
+          onClick={() => skipQueueItem(index + 1)}
         />
       </div>
     ));
