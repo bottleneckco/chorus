@@ -1,0 +1,7 @@
+{
+    "name": "Chorus",
+    "version": "0.1.0",
+    "scripts": {
+        "postinstall": "cd client && yarn build:prod"
+    }
+}
