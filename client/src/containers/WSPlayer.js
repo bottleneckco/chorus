@@ -22,15 +22,16 @@ class WSPlayer extends Component {
 
     this.state = {
       playing: true,
-      nextSongs: [],
       showSearchBar: true
     };
 
     this.initWS = this.initWS.bind(this);
     this.pause = this.pause.bind(this);
     this.resume = this.resume.bind(this);
+    this.skip = this.skip.bind(this);
     this.adjustAudioVol = this.adjustAudioVol.bind(this);
     this.skipQueueItem = this.skipQueueItem.bind(this);
+    this.handleSkipCurrentCmd = this.handleSkipCurrentCmd.bind(this);
   }
 
   componentWillMount() {
@@ -47,24 +48,35 @@ class WSPlayer extends Component {
 
     mediaSource.addEventListener('sourceopen', () => {
       const sourceBuffer = mediaSource.addSourceBuffer('audio/mpeg');
+      sourceBuffer.mode = 'sequence';
 
       this.socket.onmessage = (event) => {
         if (typeof event.data !== 'string') {
           convertToArrayBuffer(event.data).then((arrayBuffer) => {
-            sourceBuffer.appendBuffer(arrayBuffer);
+            try {
+              sourceBuffer.appendBuffer(arrayBuffer);
+            } catch (err) {
+              console.log(err);
+            }
           });
         } else {
           const wsJson = JSON.parse(event.data);
+          if (wsJson.command !== 'ping') {
+            console.log(`Received ${wsJson.command} from server`);
+          }
+          
           switch (wsJson.command) {
             case 'pause':
               audio.pause();
               this.setState({ playing: false });
-              console.log('Received pause from server');
               break;
             case 'resume':
               audio.play();
               this.setState({ playing: true });
-              console.log('Received resume from server');
+              break;
+            case 'skipCurrent':
+              sourceBuffer.remove(sourceBuffer.buffered.start(0), sourceBuffer.buffered.end(0) + 20);
+              this.handleSkipCurrentCmd();
               break;
             // case 'ping':
             //   console.log('Received ping from server');
@@ -84,12 +96,20 @@ class WSPlayer extends Component {
     this.audio = audio;
   }
 
+  handleSkipCurrentCmd() {
+    this.props.fetchQueue();
+  }
+
   pause() {
     this.socket.send('pause');
   }
 
   resume() {
     this.socket.send('resume');
+  }
+
+  skip() {
+    this.socket.send('skipCurrent');
   }
 
   adjustAudioVol(newVol) {
@@ -109,6 +129,7 @@ class WSPlayer extends Component {
         <Player
           pause={this.pause}
           resume={this.resume}
+          skip={this.skip}
           playing={this.state.playing}
           currentSong={currentSong}
           adjustAudioVol={this.adjustAudioVol}
@@ -122,7 +143,8 @@ class WSPlayer extends Component {
 WSPlayer.propTypes = {
   data: PropTypes.object.isRequired,
   queue: PropTypes.array.isRequired,
-  skipQueueItem: PropTypes.func.isRequired
+  skipQueueItem: PropTypes.func.isRequired,
+  fetchQueue: PropTypes.func.isRequired
 };
 
 export default WSPlayer;

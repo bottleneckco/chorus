@@ -151,7 +151,7 @@ func (c *Channel) Manager() {
 		}
 	}()
 
-	ticker := time.NewTicker(time.Second * 1)
+	ticker := time.NewTicker(time.Millisecond * 400)
 	for range ticker.C {
 		if c.I.Queue.Count() == 0 || len(c.I.Users) == 0 || c.I.State == ChannelStatePaused {
 			continue
@@ -217,6 +217,9 @@ func (c *Channel) Manager() {
 				case ChannelCommandSkip:
 					log.Printf("[CM 2.0] Skip requested\n")
 					os.RemoveAll(encoded.ContainerDir)
+
+					jsonData, _ := json.Marshal(map[string]string{"command": "skipCurrent"})
+					c.BroadcastTextMessage(jsonData)
 					break segmentLoop
 				}
 				break

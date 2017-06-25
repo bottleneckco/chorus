@@ -78,6 +78,9 @@ func getStream(c *gin.Context) {
 			channel.IssueCommand(model.ChannelCommandResume)
 			channel.BroadcastJSON(websocketCommand{Command: commandResume})
 			break
+		case commandSkipCurrent:
+			channel.IssueCommand(model.ChannelCommandSkip)
+			break
 		}
 	}
 }
