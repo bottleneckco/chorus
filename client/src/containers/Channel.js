@@ -105,7 +105,7 @@ class Channel extends Component {
   }
 
   componentWillMount() {
-    this.props.fetchQueue(this.props.response.id);
+    this.props.fetchQueue(this.props.response.channel.id);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -131,7 +131,7 @@ Channel.defaultProps = {
 
 Channel.propTypes = {
   response: PropTypes.object,
-  queue: PropTypes.object.isRequired,
+  queue: PropTypes.array.isRequired,
   isFetching: PropTypes.bool.isRequired,
   fetchQueue: PropTypes.func.isRequired
 };
