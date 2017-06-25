@@ -74,8 +74,9 @@ const skipQueueItemRequest = () => ({
   type: types.SKIP_QUEUE_ITEM_REQUEST
 });
 
-const skipQueueItemSuccess = () => ({
-  type: types.SKIP_QUEUE_ITEM_SUCCESS
+const skipQueueItemSuccess = (index) => ({
+  type: types.SKIP_QUEUE_ITEM_SUCCESS,
+  index
 });
 
 const skipQueueItemFailure = (error) => ({
@@ -84,7 +85,7 @@ const skipQueueItemFailure = (error) => ({
 });
 
 // index starts from 0
-export const skipQueue = (channelId, index) => (dispatch) => {
+export const skipQueueItem = (channelId, index) => (dispatch) => {
   dispatch(skipQueueItemRequest());
   return fetch(`${API_ROOT}/api/channels/${channelId}/queue/${index}`, {
     method: 'DELETE',
@@ -95,7 +96,7 @@ export const skipQueue = (channelId, index) => (dispatch) => {
     ))
     .then((json) => {
       if (json.status === 'ok') {
-        dispatch(skipQueueItemSuccess());
+        dispatch(skipQueueItemSuccess(index));
       } else {
         dispatch(skipQueueItemFailure(json));
       }

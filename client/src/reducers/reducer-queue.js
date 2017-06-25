@@ -18,12 +18,17 @@ const queue = () => {
     switch (action.type) {
       case types.FETCH_CHANNEL_QUEUE_SUCCESS:
         return action.data.queue;
+      case types.SKIP_QUEUE_ITEM_SUCCESS:
+        return [
+          ...state.slice(0, action.index),
+          ...state.slice(action.index + 1)
+        ];
       default:
         return state;
     }
   };
 
-  // Handle errors from fetchQueue, addToQueue, SkipQueue
+  // Handle errors from fetchQueue, addToQueue, SkipQueueItem
   const fetchError = (state = '', action) => {
     switch (action.type) {
       case types.FETCH_CHANNEL_QUEUE_REQUEST:
