@@ -47,7 +47,7 @@ func createChannel(c *gin.Context) {
 		Description:       payload.Description,
 		Users:             users,
 		VideoResultsCache: make(map[string]youtube.YoutubeVideo),
-		Queue:             make([]youtube.YoutubeVideo, 0),
+		Queue:             make([]QueueItem, 0),
 		SkipCurrent:       false,
 	}
 
@@ -73,9 +73,9 @@ func createChannel(c *gin.Context) {
 				continue
 			}
 
-			result := channel.Queue[0]
+			queueItem := channel.Queue[0]
 
-			log.Printf("Downloading file '%s' via URL '%s'\n", result.Fulltitle, result.Formats[0].URL)
+			log.Printf("Downloading file '%s' via URL '%s'\n", queueItem.Video.Fulltitle, queueItem.Video.Formats[0].URL)
 
 			// Download file
 			downloadFile, err := ioutil.TempFile(os.TempDir(), "audio")
@@ -83,7 +83,7 @@ func createChannel(c *gin.Context) {
 				log.Println(err)
 				continue
 			}
-			resp, err := http.Get(result.Formats[0].URL)
+			resp, err := http.Get(queueItem.Video.Formats[0].URL)
 			if err != nil {
 				log.Println(err)
 				continue
@@ -129,7 +129,7 @@ func createChannel(c *gin.Context) {
 
 			numUsers = len(channel.Users)
 			if len(channel.Queue) == 1 {
-				channel.Queue = make([]youtube.YoutubeVideo, 0)
+				channel.Queue = make([]QueueItem, 0)
 			} else {
 				channel.Queue = channel.Queue[1:]
 			}
@@ -227,13 +227,17 @@ func getChannelQueue(c *gin.Context) {
 		return
 	}
 
-	var jsonArray = make([]videoResult, 0)
-	for _, result := range channel.Queue {
-		jsonArray = append(jsonArray, videoResult{
-			Name:         result.Fulltitle,
-			ThumbnailURL: result.Thumbnail,
-			Duration:     result.Duration,
-			URL:          result.WebpageURL,
+	var jsonArray = make([]channelListQueueItem, 0)
+	for index, queueItem := range channel.Queue {
+		jsonArray = append(jsonArray, channelListQueueItem{
+			ID:   index,
+			User: queueItem.User,
+			VideoResult: videoResult{
+				Name:         queueItem.Video.Fulltitle,
+				ThumbnailURL: queueItem.Video.Thumbnail,
+				Duration:     queueItem.Video.Duration,
+				URL:          queueItem.Video.WebpageURL,
+			},
 		})
 	}
 
@@ -255,6 +259,15 @@ func addToChannelQueue(c *gin.Context) {
 		return
 	}
 
+	user, err := getUserByCookies(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, response{
+			Status: statusError,
+			Error:  "Invalid payload",
+		})
+		return
+	}
+
 	channel, isChannelExists := channelMap[c.Param("id")]
 	if !isChannelExists {
 		c.JSON(http.StatusInternalServerError, response{
@@ -264,7 +277,10 @@ func addToChannelQueue(c *gin.Context) {
 		return
 	}
 
-	channel.Queue = append(channel.Queue, channel.VideoResultsCache[payload.URL])
+	channel.Queue = append(channel.Queue, QueueItem{
+		User:  user,
+		Video: channel.VideoResultsCache[payload.URL],
+	})
 	channelMap[c.Param("id")] = channel
 
 	c.JSON(http.StatusOK, response{Status: statusOK})

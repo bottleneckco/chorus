@@ -55,8 +55,14 @@ type channelListUsersResponse struct {
 
 type channelListQueueResponse struct {
 	response
-	Count int           `json:"count"`
-	Queue []videoResult `json:"queue"`
+	Count int                    `json:"count"`
+	Queue []channelListQueueItem `json:"queue"`
+}
+
+type channelListQueueItem struct {
+	ID          int         `json:"id"`
+	User        User        `json:"user"`
+	VideoResult videoResult `json:"video"`
 }
 
 type searchResponse struct {
@@ -73,7 +79,7 @@ type Channel struct {
 	Description       string                          `json:"description"`
 	CreatedBy         int                             `json:"created_by"`
 	VideoResultsCache map[string]youtube.YoutubeVideo `json:"-"`
-	Queue             []youtube.YoutubeVideo          `json:"-"`
+	Queue             []QueueItem                     `json:"-"`
 	Users             map[int]User                    `json:"-"`
 	UsersArray        []User                          `json:"users"` // UsersArray is only for display
 	SkipCurrent       bool                            `json:"-"`     // Set this to true so the manager will abort distributing the current song on its next loop
@@ -113,6 +119,11 @@ type User struct {
 	ID       int             `json:"id"`
 	Nickname string          `json:"nickname"`
 	WSConn   *websocket.Conn `json:"-"`
+}
+
+type QueueItem struct {
+	User  User                 `json:"user"`
+	Video youtube.YoutubeVideo `json:"video"`
 }
 
 // WebSocket Command Interface models
