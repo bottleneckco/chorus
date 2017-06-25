@@ -37,10 +37,30 @@ class Queue extends Component {
     const { showSearchBar } = this.state;
 
     if (showSearchBar) {
-      return <SearchBar hideSearchBar={() => this.setState({ showSearchBar: false })} />;
+      return (
+        <SearchBar
+          hideSearchBar={() => this.setState({ showSearchBar: false })}
+        />
+      );
     }
 
     return null;
+  }
+
+  renderList() {
+    if (this.props.queue.length > 0) {
+      return (
+        <div className="queue--list">
+          <div className="queue--headings">
+            <span className="col--song">Next</span>
+            <span className="col--user">Added by</span>
+          </div>
+          {this.renderSongsInQueue()}
+        </div>
+      );
+    }
+
+    return <p className="queue--empty">Your queue is empty.</p>;
   }
 
   render() {
@@ -52,14 +72,8 @@ class Queue extends Component {
           className="button-solid button-orange-10 queue--add"
           onClick={() => this.setState({ showSearchBar: true })}
         />
-        <div className="queue--list">
-          <div className="queue--headings">
-            <span className="col--song">Next</span>
-            <span className="col--user">Added by</span>
-          </div>
-          {this.renderSongsInQueue()}
-          {this.renderSearchBar()}
-        </div>
+        {this.renderList()}
+        {this.renderSearchBar()}
       </div>
     );
   }

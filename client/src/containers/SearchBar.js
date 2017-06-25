@@ -16,22 +16,17 @@ class SearchBar extends Component {
   constructor(props) {
     super(props);
 
-    this.defaultQuery = 'Search for a song...';
     this.state = {
-      query: this.defaultQuery,
+      query: '',
       searchItems: []
     };
 
     this.onTextboxChange = this.onTextboxChange.bind(this);
-    this.onTextboxFocus = this.onTextboxFocus.bind(this);
-    this.onTextboxBlur = this.onTextboxBlur.bind(this);
     this.onTextboxKeydown = this.onTextboxKeydown.bind(this);
     this.renderItems = this.renderItems.bind(this);
     this.addMusicToQueue = this.addMusicToQueue.bind(this);
     this.handleClickOutside = this.handleClickOutside.bind(this);
     this.destroy = this.destroy.bind(this);
-
-    this.handleClickOutside = this.handleClickOutside.bind(this);
   }
 
   componentWillMount() {
@@ -42,8 +37,14 @@ class SearchBar extends Component {
     window.addEventListener('click', this.handleClickOutside, true);
   }
 
-  componentWillReceiveProps(nextProps) {
-    // console.log(nextProps);
+  componentWillReceiveProps() {
+    const main = this;
+    document.getElementById('overlay').addEventListener('click', function(e) {
+      e = window.event || e;
+      if (this === e.target) {
+        main.destroy();
+      }
+    });
   }
 
   componentWillUnmount() {
@@ -52,20 +53,6 @@ class SearchBar extends Component {
 
   onTextboxChange(e) {
     this.setState({ query: e.target.value });
-  }
-
-  onTextboxFocus() {
-    if (this.state.query === this.defaultQuery) {
-      this.setState({ query: '' });
-    }
-  }
-
-  onTextboxBlur() {
-    if (this.state.query === '') {
-      this.setState({ query: this.defaultQuery });
-    }
-
-    this.props.clearSearchResults();
   }
 
   onTextboxKeydown(e) {
@@ -98,7 +85,11 @@ class SearchBar extends Component {
     const { results } = this.props;
 
     return results.map((item) => (
-      <SearchItem item={item} key={item.url} addMusic={this.addMusicToQueue} />
+      <SearchItem
+        item={item}
+        key={item.url}
+        addMusic={this.addMusicToQueue}
+      />
     ));
   }
 
@@ -106,19 +97,20 @@ class SearchBar extends Component {
     const { query } = this.state;
 
     return (
-      <div className="searchbar">
-        <input
-          type="text"
-          className="searchbar-textbox"
-          value={query}
-          onChange={this.onTextboxChange}
-          onFocus={this.onTextboxFocus}
-          onBlur={this.onTextboxBlur}
-          onKeyDown={this.onTextboxKeydown}
-          disabled={this.props.searchIsFetching}
-        />
-        <div>
-          {this.renderItems()}
+      <div id="overlay" className="overlay">
+        <div className="search">
+          <div className="search--content">
+            <input
+              type="text"
+              value={query}
+              className="search--textbox"
+              placeholder="Search for a song..."
+              onChange={this.onTextboxChange}
+              onKeyDown={this.onTextboxKeydown}
+              disabled={this.props.searchIsFetching}
+            />
+            {this.renderItems()}
+          </div>
         </div>
       </div>
     );
