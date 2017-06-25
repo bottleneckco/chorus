@@ -22,6 +22,7 @@ class WSPlayer extends Component {
     super(props);
 
     this.state = { playing: true };
+    this.adjustAudioVol = this.adjustAudioVol.bind(this);
   }
 
   componentWillMount() {
@@ -69,7 +70,10 @@ class WSPlayer extends Component {
 
     // play audio once mounted
     audio.src = URL.createObjectURL(mediaSource);
+    audio.volume = 0.8;
     audio.play();
+
+    this.audio = audio;
   }
 
   pause() {
@@ -80,6 +84,10 @@ class WSPlayer extends Component {
     this.socket.send('resume');
   }
 
+  adjustAudioVol(newVol) {
+    this.audio.volume = newVol / 100.0;
+  }
+
   render() {
     return (
       <div className="channel">
@@ -88,6 +96,7 @@ class WSPlayer extends Component {
           pause={this.pause}
           resume={this.resume}
           playing={this.state.playing}
+          adjustAudioVol={this.adjustAudioVol}
         />
         <Queue queue={this.props.queue} />
       </div>
