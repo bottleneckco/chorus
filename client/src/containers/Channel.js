@@ -33,6 +33,7 @@ class Channel extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    console.log('receiveprops');
     if (nextProps.rehydrated && !this.state.rehydrated) {
       this.setState({ rehydrated: true });
 

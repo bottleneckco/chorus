@@ -15,9 +15,9 @@ const fetchQueueFailure = (error) => ({
   type: types.FETCH_CHANNEL_QUEUE_FAILURE
 });
 
-export const fetchQueue = (queueId) => (dispatch) => {
+export const fetchQueue = (channelId) => (dispatch) => {
   dispatch(fetchQueueRequest());
-  return fetch(`${API_ROOT}/api/channels/${queueId}/queue`, {
+  return fetch(`${API_ROOT}/api/channels/${channelId}/queue`, {
     method: 'GET',
     credentials: 'same-origin'
   })
