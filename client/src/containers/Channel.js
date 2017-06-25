@@ -55,6 +55,10 @@ class Channel extends Component {
     this.setState({ shouldOnboard: false });
   }
 
+  adjustAudioVol(newVol) {
+    this.audio.volume(newVol / 100.0);
+  }
+
   render() {
     const { data, channelIsFetching, queue } = this.props;
 
