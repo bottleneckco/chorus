@@ -62,7 +62,7 @@ func setUserCookie(user User, c *gin.Context) {
 }
 
 func formatUsersForJson(users map[int]User) []User {
-	var usersArr []User
+	var usersArr = make([]User, 0)
 
 	for _, v := range users {
 		usersArr = append(usersArr, v)
