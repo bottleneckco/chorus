@@ -178,6 +178,7 @@ func addUserToChannel(c *gin.Context) {
 
 	channel.Users = users
 	channelMap[c.Param("id")] = channel
+	setUserCookie(newUser, c)
 
 	// Populate usersArr for view
 	channel.UsersArray = formatUsersForJson(users)

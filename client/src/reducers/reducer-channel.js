@@ -37,7 +37,7 @@ const channel = () => {
           ...state,
           users: [
             ...state.users,
-            action.data
+            action.data.user
           ]
         };
       default:

@@ -33,7 +33,7 @@ class Onboard extends Component {
           <Form
             fields={fields}
             handleInput={this.handleInput}
-            submitForm={this.props.submitForm}
+            submitForm={(e) => this.props.submitForm(e, this.state)}
             submitButtonText="Join"
           />
         </div>

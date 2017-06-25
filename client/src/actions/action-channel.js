@@ -88,7 +88,8 @@ export const addUserToChannel = (channelId, data) => (dispatch) => {
     body: JSON.stringify(data),
     headers: {
       'Content-Type': 'application/json'
-    }
+    },
+    credentials: 'same-origin'
   })
     .then((response) => (
       response.json()
