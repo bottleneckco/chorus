@@ -24,7 +24,11 @@ class WSPlayer extends Component {
 
     this.state = {
       playing: true,
+<<<<<<< HEAD
       nextSongs: []
+=======
+      showSearchBar: true
+>>>>>>> Basic searchbar layout completed
     };
 
     this.initWS = this.initWS.bind(this);
@@ -101,6 +105,16 @@ class WSPlayer extends Component {
     this.props.skipQueueItem(this.props.data.id, index);
   }
 
+  renderSearchBar() {
+    const { showSearchBar } = this.state;
+
+    if (showSearchBar) {
+      return <SearchBar hideSearchBar={() => this.setState({ showSearchBar: false })} />;
+    }
+
+    return null;
+  }
+
   render() {
     const currentSong = this.props.queue[0] || {};
 
@@ -115,7 +129,7 @@ class WSPlayer extends Component {
           adjustAudioVol={this.adjustAudioVol}
         />
         <Queue queue={this.props.queue} skipQueueItem={this.skipQueueItem} />
-        <SearchBar />
+        {this.renderSearchBar()}
       </div>
     );
   }
