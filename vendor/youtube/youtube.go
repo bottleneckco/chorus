@@ -12,7 +12,7 @@ import (
 // Search for a Youtube Video
 func Search(term string, numResults int) ([]YoutubeVideo, error) {
 	var results []YoutubeVideo
-	cmd := exec.Command("youtube-dl", fmt.Sprintf("ytsearch%d:%s", numResults, term), "-f", "bestaudio", "--skip-download", "--no-playlist", "--print-json")
+	cmd := exec.Command("youtube-dl", fmt.Sprintf("ytsearch%d:%s", numResults, term), "-f", "bestaudio[vcodec=none,abr=160]", "--skip-download", "--no-playlist", "--print-json")
 
 	var outBuffer, errBuffer bytes.Buffer
 	cmd.Stdout = &outBuffer

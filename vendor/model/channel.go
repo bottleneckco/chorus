@@ -169,7 +169,7 @@ func (c *Channel) Manager() {
 			log.Println(err)
 			continue
 		}
-		resp, err := http.Get(result.Formats[0].URL)
+		resp, err := http.Get(result.URL)
 		if err != nil {
 			log.Println(err)
 			continue
