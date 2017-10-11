@@ -45,19 +45,29 @@ class WSPlayer extends Component {
     const audio = document.createElement('audio');
     const mediaSource = new MediaSource();
 
+    const queue = [];
+
     mediaSource.addEventListener('sourceopen', () => {
       const sourceBuffer = mediaSource.addSourceBuffer('audio/mpeg');
       sourceBuffer.mode = 'sequence';
 
+      setInterval(() => {
+        if (queue.length === 0) {
+          return;
+        }
+        const data = queue.pop();
+        convertToArrayBuffer(data).then((arrayBuffer) => {
+          try {
+            sourceBuffer.appendBuffer(arrayBuffer);
+          } catch (err) {
+            console.log(err);
+          }
+        });
+      }, 600);
+
       this.socket.onmessage = (event) => {
         if (typeof event.data !== 'string') {
-          convertToArrayBuffer(event.data).then((arrayBuffer) => {
-            try {
-              sourceBuffer.appendBuffer(arrayBuffer);
-            } catch (err) {
-              console.log(err);
-            }
-          });
+          queue.unshift(event.data);
         } else {
           const wsJson = JSON.parse(event.data);
           if (wsJson.command !== 'ping') {
