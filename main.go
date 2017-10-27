@@ -1,7 +1,7 @@
 package main
 
 import (
-	"web"
+	"github.com/bottleneckco/chorus/web"
 )
 
 func main() {

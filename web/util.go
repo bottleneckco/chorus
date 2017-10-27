@@ -2,9 +2,10 @@ package web
 
 import (
 	"math/rand"
-	"model"
 	"sort"
 	"strconv"
+
+	"github.com/bottleneckco/chorus/model"
 
 	"github.com/gin-gonic/gin"
 	hashids "github.com/speps/go-hashids"
