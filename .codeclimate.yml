@@ -1,0 +1,9 @@
+engines:
+  govet:
+    enabled: true
+  eslint:
+    enabled: true
+ratings:
+  paths:
+    - "**.go"
+    - "**.js"
