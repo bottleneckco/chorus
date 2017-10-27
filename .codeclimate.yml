@@ -5,6 +5,8 @@ engines:
     enabled: true
   eslint:
     enabled: true
+    config:
+      config: client/.eslintrc
 ratings:
   paths:
     - "**.go"
