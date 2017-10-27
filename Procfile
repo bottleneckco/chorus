@@ -1,1 +1,1 @@
-web: reactriot2017-chorus
+web: chorus
