@@ -6,6 +6,6 @@
         "yarn": "0.24.6"
     },
     "scripts": {
-        "postinstall": "cd client && yarn install && yarn build:prod"
+        "heroku-postbuild": "cd client && yarn install && yarn build:prod"
     }
 }

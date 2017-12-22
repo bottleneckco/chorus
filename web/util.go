@@ -2,9 +2,10 @@ package web
 
 import (
 	"math/rand"
-	"model"
 	"sort"
 	"strconv"
+
+	"github.com/bottleneckco/chorus/model"
 
 	"github.com/gin-gonic/gin"
 	hashids "github.com/speps/go-hashids"
@@ -14,7 +15,7 @@ func generateAccessCode() string {
 	hd := hashids.NewData()
 	hd.Salt = "random salt"
 	hd.MinLength = 5
-	h, _ := hashids.NewWithData(hd)
+	h := hashids.NewWithData(hd)
 
 	e, _ := h.Encode([]int{rand.Int()})
 

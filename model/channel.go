@@ -1,7 +1,6 @@
 package model
 
 import (
-	"ffmpeg"
 	"io"
 	"io/ioutil"
 	"log"
@@ -9,7 +8,10 @@ import (
 	"os"
 	"path"
 	"time"
-	"youtube"
+
+	"github.com/bottleneckco/chorus/ffmpeg"
+
+	"github.com/bottleneckco/chorus/youtube"
 
 	"encoding/json"
 

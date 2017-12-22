@@ -1,6 +1,6 @@
 package web
 
-import "model"
+import "github.com/bottleneckco/chorus/model"
 
 const (
 	statusOK           = "ok"

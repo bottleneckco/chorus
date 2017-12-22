@@ -1,9 +1,10 @@
 package web
 
 import (
-	"model"
 	"net/http"
 	"strconv"
+
+	"github.com/bottleneckco/chorus/model"
 
 	"github.com/gin-gonic/gin"
 )

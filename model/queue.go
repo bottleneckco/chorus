@@ -1,7 +1,7 @@
 package model
 
 import (
-	"youtube"
+	"github.com/bottleneckco/chorus/youtube"
 )
 
 type Queue struct {

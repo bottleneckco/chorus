@@ -2,9 +2,10 @@ package web
 
 import (
 	"fmt"
-	"model"
 	"os"
 	"strings"
+
+	"github.com/bottleneckco/chorus/model"
 
 	"io/ioutil"
 	"net/http"
@@ -13,7 +14,7 @@ import (
 
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
-	"github.com/itsjamie/gin-cors"
+	cors "github.com/itsjamie/gin-cors"
 )
 
 var channelMap = make(map[string]*model.Channel)

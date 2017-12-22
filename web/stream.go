@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"model"
+	"github.com/bottleneckco/chorus/model"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"

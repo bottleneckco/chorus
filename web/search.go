@@ -3,7 +3,8 @@ package web
 import (
 	"log"
 	"net/http"
-	"youtube"
+
+	"github.com/bottleneckco/chorus/youtube"
 
 	"github.com/gin-gonic/gin"
 )
